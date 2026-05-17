@@ -4,7 +4,7 @@ import { usePaginatedQuery } from "convex-helpers/react";
 import { api } from "../convex/_generated/api";
 import { useCallback, useState, useEffect } from "react";
 import type { EntryFilter, SearchResult, SearchType } from "@convex-dev/rag";
-import type { Filters, PublicFile } from "../convex/example";
+import type { Filters, PublicFile } from "../convex/rag/rag";
 import { MarkdownRenderer } from "./MarkdownRenderer";
 import { UploadSection } from "./components/UploadSection";
 import { FileList } from "./components/FileList";
@@ -58,7 +58,7 @@ function Example() {
   const convex = useConvex();
 
   const documentChunks = usePaginatedQuery(
-    api.example.listChunks,
+    api.rag.sources.listChunks,
     selectedDocument?.entryId
       ? {
           entryId: selectedDocument.entryId,
@@ -113,14 +113,17 @@ function Example() {
                   ? selectedDocument.global
                   : searchGlobal;
 
-          const questionResults = await convex.action(api.example.askQuestion, {
-            prompt: searchQuery,
-            globalNamespace: globalNamespace || false,
-            filter,
-            limit,
-            chunkContext,
-            searchType,
-          });
+          const questionResults = await convex.action(
+            api.rag.answering.askQuestion,
+            {
+              prompt: searchQuery,
+              globalNamespace: globalNamespace || false,
+              filter,
+              limit,
+              chunkContext,
+              searchType,
+            },
+          );
 
           const questionSources = questionResults?.files || [];
 
@@ -147,7 +150,7 @@ function Example() {
           let results;
           switch (searchScope) {
             case "general":
-              results = await convex.action(api.example.search, {
+              results = await convex.action(api.rag.answering.search, {
                 query: searchQuery,
                 globalNamespace: searchGlobal,
                 limit,
@@ -156,7 +159,7 @@ function Example() {
               });
               break;
             case "category":
-              results = await convex.action(api.example.searchCategory, {
+              results = await convex.action(api.rag.answering.searchCategory, {
                 query: searchQuery,
                 globalNamespace: categorySearchGlobal,
                 category: selectedCategory,
@@ -166,7 +169,7 @@ function Example() {
               });
               break;
             case "file":
-              results = await convex.action(api.example.searchFile, {
+              results = await convex.action(api.rag.answering.searchFile, {
                 query: searchQuery,
                 globalNamespace: selectedDocument!.global || false,
                 filename: selectedDocument!.filename || "",

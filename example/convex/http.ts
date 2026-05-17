@@ -1,6 +1,6 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server.js";
-import { addFileAsync } from "./example.js";
+import { addFileAsync } from "./rag/indexing.js";
 import { corsRouter } from "convex-helpers/server/cors";
 
 const cors = corsRouter(httpRouter(), {

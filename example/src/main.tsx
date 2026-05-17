@@ -4,6 +4,8 @@ import { ConvexProvider, ConvexReactClient } from "convex/react";
 import Example from "./Example.jsx";
 import "./index.css";
 
+console.log(import.meta.env);
+
 const address = import.meta.env.VITE_CONVEX_URL;
 
 const convex = new ConvexReactClient(address);

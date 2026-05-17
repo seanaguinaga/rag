@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "react";
 import { useConvex, useQuery } from "convex/react";
 import { usePaginatedQuery } from "convex-helpers/react";
 import { api } from "../../convex/_generated/api";
-import type { PublicFile } from "../../convex/example";
+import type { PublicFile } from "../../convex/rag/rag";
 
 interface FileListProps {
   onFileSelect: (file: PublicFile | null) => void;
@@ -13,7 +13,7 @@ interface FileListProps {
 }
 
 function PendingDocumentProgress({ doc }: { doc: PublicFile }) {
-  const chunks = useQuery(api.example.listChunks, {
+  const chunks = useQuery(api.rag.sources.listChunks, {
     entryId: doc.entryId,
     order: "desc",
     paginationOpts: { cursor: null, numItems: 100 },
@@ -131,7 +131,7 @@ export function FileList({
   const convex = useConvex();
 
   const globalFiles = usePaginatedQuery(
-    api.example.listFiles,
+    api.rag.sources.listFiles,
     {
       globalNamespace: true,
     },
@@ -139,19 +139,19 @@ export function FileList({
   );
 
   const userFiles = usePaginatedQuery(
-    api.example.listFiles,
+    api.rag.sources.listFiles,
     {
       globalNamespace: false,
     },
     { initialNumItems: 10 },
   );
 
-  const pendingFiles = useQuery(api.example.listPendingFiles);
+  const pendingFiles = useQuery(api.rag.sources.listPendingFiles);
 
   const handleDelete = useCallback(
     async (doc: PublicFile) => {
       try {
-        await convex.mutation(api.example.deleteFile, {
+        await convex.mutation(api.rag.sources.deleteFile, {
           entryId: doc.entryId,
         });
 

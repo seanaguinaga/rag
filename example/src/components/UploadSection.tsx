@@ -138,7 +138,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
           body: blob,
         });
       } else {
-        await convex.action(api.example.addFile, {
+        await convex.action(api.rag.indexing.addFile, {
           bytes: await blob.arrayBuffer(),
           filename,
           mimeType: blob.type || "text/plain",

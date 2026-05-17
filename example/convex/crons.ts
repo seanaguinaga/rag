@@ -6,7 +6,7 @@ const crons = cronJobs();
 crons.interval(
   "deleteOldContent",
   { hours: 1 },
-  internal.example.deleteOldContent,
+  internal.rag.indexing.deleteOldContent,
   {},
 );
 
