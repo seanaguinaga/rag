@@ -74,12 +74,3 @@ export function useSearchOptionsController() {
     setSearchType,
   };
 }
-
-export function useSearchCategoriesController() {
-  const [categories, setCategories] = useState<string[]>([]);
-
-  return {
-    categories,
-    setCategories,
-  };
-}

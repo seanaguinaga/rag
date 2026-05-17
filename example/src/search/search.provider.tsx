@@ -1,7 +1,6 @@
 import { type ReactNode } from "react";
 import type { PublicFile } from "../../convex/rag/engine";
 import {
-  CategoriesContext,
   ExecutionContext,
   OptionsContext,
   RuntimeContext,
@@ -13,7 +12,6 @@ import {
 import { type QueryMode, useRagSearch } from "./search.controller";
 import {
   type SearchScope,
-  useSearchCategoriesController,
   useSearchOptionsController,
   useSearchSelectionController,
 } from "./search-form.controller";
@@ -21,7 +19,6 @@ import {
 export type SearchRuntimeValue = ReturnType<typeof useSearchRuntimeValue>;
 export type SearchSelectionValue = ReturnType<typeof useSearchSelectionValue>;
 export type SearchOptionsValue = ReturnType<typeof useSearchOptionsValue>;
-export type SearchCategoriesValue = ReturnType<typeof useSearchCategoriesValue>;
 export type SearchExecutionValue = ReturnType<typeof useSearchExecutionValue>;
 
 export function SearchProvider({ children }: { children: ReactNode }) {
@@ -29,9 +26,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     <SearchRuntimeProvider>
       <SearchSelectionProvider>
         <SearchOptionsProvider>
-          <SearchCategoriesProvider>
-            <SearchExecutionProvider>{children}</SearchExecutionProvider>
-          </SearchCategoriesProvider>
+          <SearchExecutionProvider>{children}</SearchExecutionProvider>
         </SearchOptionsProvider>
       </SearchSelectionProvider>
     </SearchRuntimeProvider>
@@ -134,20 +129,6 @@ function SearchOptionsProvider({ children }: { children: ReactNode }) {
 
 function useSearchOptionsValue() {
   return useSearchOptionsController();
-}
-
-function SearchCategoriesProvider({ children }: { children: ReactNode }) {
-  const value = useSearchCategoriesValue();
-
-  return (
-    <CategoriesContext.Provider value={value}>
-      {children}
-    </CategoriesContext.Provider>
-  );
-}
-
-function useSearchCategoriesValue() {
-  return useSearchCategoriesController();
 }
 
 function SearchExecutionProvider({ children }: { children: ReactNode }) {

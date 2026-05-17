@@ -36,7 +36,7 @@ export function SearchResultsController() {
     !searchResults && !questionResult && !showDocumentChunks;
 
   return (
-    <div className="flex-1 overflow-y-auto p-6">
+    <div className="space-y-6">
       {questionResult && <QuestionAnswerUi questionResult={questionResult} />}
 
       {showDocumentChunks && selectedDocument && (

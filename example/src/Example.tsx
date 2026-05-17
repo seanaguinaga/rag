@@ -1,25 +1,60 @@
 import "./Example.css";
-import { SearchInterface } from "./components/SearchInterface";
-import { UploadSection } from "./components/UploadSection";
+import { BookOpen, Search } from "lucide-react";
+import { useState } from "react";
+import { Button } from "./components/ui/button";
+import { KnowledgeLibraryProvider } from "./knowledge/knowledge-library.context";
+import { KnowledgePage } from "./knowledge/KnowledgePage";
 import { ErrorBoundaryUi } from "./search/error-boundary.ui";
-import { SearchFileListController } from "./search/search-file-list.controller";
+import { SearchPage } from "./search/SearchPage";
 import { SearchProvider } from "./search/search.provider";
-import { SearchResultsController } from "./search/search-results.controller";
+
+type AppPage = "search" | "knowledge";
 
 function ExampleContent() {
+  const [page, setPage] = useState<AppPage>("search");
+
   return (
     <SearchProvider>
-      <div className="min-h-screen bg-gradient-to-br from-zinc-50 via-blue-50 to-violet-50 flex">
-        <div className="w-80 bg-white/90 backdrop-blur-sm border-r border-zinc-200/50 flex flex-col shadow-xl">
-          <UploadSection />
-          <SearchFileListController />
-        </div>
+      <KnowledgeLibraryProvider>
+        <div className="min-h-screen bg-background text-foreground">
+          <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
+            <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Convex RAG
+                </p>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Document knowledge example
+                </h1>
+              </div>
+              <nav className="flex w-full gap-2 md:w-auto" aria-label="Primary">
+                <Button
+                  type="button"
+                  variant={page === "search" ? "default" : "outline"}
+                  className="flex-1 md:flex-none"
+                  onClick={() => setPage("search")}
+                >
+                  <Search />
+                  Search
+                </Button>
+                <Button
+                  type="button"
+                  variant={page === "knowledge" ? "default" : "outline"}
+                  className="flex-1 md:flex-none"
+                  onClick={() => setPage("knowledge")}
+                >
+                  <BookOpen />
+                  Knowledge
+                </Button>
+              </nav>
+            </div>
+          </header>
 
-        <div className="flex-1 flex flex-col">
-          <SearchInterface />
-          <SearchResultsController />
+          <main className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6">
+            {page === "search" ? <SearchPage /> : <KnowledgePage />}
+          </main>
         </div>
-      </div>
+      </KnowledgeLibraryProvider>
     </SearchProvider>
   );
 }

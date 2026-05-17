@@ -1,6 +1,5 @@
 import { createContext, use } from "react";
 import type {
-  SearchCategoriesValue,
   SearchExecutionValue,
   SearchOptionsValue,
   SearchRuntimeValue,
@@ -12,9 +11,6 @@ export const SelectionContext = createContext<SearchSelectionValue | null>(
   null,
 );
 export const OptionsContext = createContext<SearchOptionsValue | null>(null);
-export const CategoriesContext = createContext<SearchCategoriesValue | null>(
-  null,
-);
 export const ExecutionContext = createContext<SearchExecutionValue | null>(
   null,
 );
@@ -36,10 +32,6 @@ export function useSearchSelection() {
 
 export function useSearchOptions() {
   return useRequiredContext(use(OptionsContext), "useSearchOptions");
-}
-
-export function useSearchCategories() {
-  return useRequiredContext(use(CategoriesContext), "useSearchCategories");
 }
 
 export function useSearchExecution() {
