@@ -43,7 +43,20 @@ export async function toFiles(
   ctx: ActionCtx,
   files: SearchEntry<Filters, Metadata>[],
 ) {
-  return await Promise.all(files.map((entry) => toFile(ctx, entry, false)));
+  const results = await Promise.allSettled(
+    files.map((entry) => toFile(ctx, entry, false)),
+  );
+
+  return results.flatMap((result, index) => {
+    if (result.status === "fulfilled") {
+      return [result.value];
+    }
+    console.warn("Skipping malformed RAG source", {
+      entryId: files[index]?.entryId,
+      error: getErrorMessage(result.reason),
+    });
+    return [];
+  });
 }
 
 export async function toFile(
@@ -69,4 +82,11 @@ export async function toFile(
 export async function getUserId(_ctx: QueryCtx | MutationCtx | ActionCtx) {
   // Demo-only identity. Production code should derive this from Convex auth.
   return "test user";
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
 }

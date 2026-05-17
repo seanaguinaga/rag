@@ -1,14 +1,17 @@
 import type { SearchType } from "@convex-dev/rag";
 import { useState } from "react";
-
-type SearchScope = "general" | "category" | "file";
-type QueryMode = "search" | "question";
+import type { PublicFile } from "../../convex/rag/engine";
+import type {
+  QueryMode,
+  SearchScope,
+  SearchState,
+} from "../search/search.types";
 
 interface SearchInterfaceProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onSearch: (mode: QueryMode) => void;
-  isSearching: boolean;
+  searchStatus: SearchState["status"];
   searchScope: SearchScope;
   setSearchScope: (type: SearchScope) => void;
   searchGlobal: boolean;
@@ -17,7 +20,7 @@ interface SearchInterfaceProps {
   setCategorySearchGlobal: (global: boolean) => void;
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
-  selectedDocument: any;
+  selectedDocument: PublicFile | null;
   limit: number;
   setLimit: (limit: number) => void;
   chunksBefore: number;
@@ -33,7 +36,7 @@ export function SearchInterface({
   searchQuery,
   setSearchQuery,
   onSearch,
-  isSearching,
+  searchStatus,
   searchScope,
   setSearchScope,
   searchGlobal,
@@ -54,6 +57,7 @@ export function SearchInterface({
   setSearchType,
 }: SearchInterfaceProps) {
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const isLoading = searchStatus === "loading";
 
   return (
     <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200/50 p-6 shadow-sm">
@@ -219,9 +223,9 @@ export function SearchInterface({
         <div className="absolute right-2 top-2 bottom-2 flex space-x-2">
           <button
             onClick={() => onSearch("search")}
-            disabled={isSearching || !searchQuery.trim()}
+            disabled={isLoading || !searchQuery.trim()}
             className={`px-4 text-white rounded-lg font-semibold transition-all duration-300 ${
-              isSearching || !searchQuery.trim()
+              isLoading || !searchQuery.trim()
                 ? "bg-gray-300 cursor-not-allowed"
                 : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg hover:shadow-xl"
             }`}
@@ -230,9 +234,9 @@ export function SearchInterface({
           </button>
           <button
             onClick={() => onSearch("question")}
-            disabled={isSearching || !searchQuery.trim()}
+            disabled={isLoading || !searchQuery.trim()}
             className={`px-4 text-white rounded-lg font-semibold transition-all duration-300 ${
-              isSearching || !searchQuery.trim()
+              isLoading || !searchQuery.trim()
                 ? "bg-gray-300 cursor-not-allowed"
                 : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl"
             }`}
