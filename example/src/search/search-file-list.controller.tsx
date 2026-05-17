@@ -1,16 +1,18 @@
 import { FileList } from "../components/FileList";
-import { useSearch } from "./search.context";
+import { useSearchCategories, useSearchSelection } from "./search.context";
 
 export function SearchFileListController() {
-  const { form, selectFile, selectCategory, selectSidebarScope } = useSearch();
+  const { selectedDocument, selectFile, selectCategory, selectSidebarScope } =
+    useSearchSelection();
+  const { setCategories } = useSearchCategories();
 
   return (
     <FileList
       onFileSelect={selectFile}
       onCategorySelect={selectCategory}
       onSearchTypeChange={selectSidebarScope}
-      selectedDocument={form.selectedDocument}
-      onCategoriesChange={form.setCategories}
+      selectedDocument={selectedDocument}
+      onCategoriesChange={setCategories}
     />
   );
 }

@@ -3,13 +3,13 @@ import { useState } from "react";
 import { api } from "../../convex/_generated/api";
 import { DocumentChunksUi } from "./document-chunks.ui";
 import { QuestionAnswerUi } from "./question-answer.ui";
-import { useSearch } from "./search.context";
+import { useSearchExecution, useSearchSelection } from "./search.context";
 import { SearchEmptyStateUi } from "./search-empty-state.ui";
 import { SearchResultsUi } from "./search-results.ui";
 
 export function SearchResultsController() {
-  const { form, searchState, retrySearch, clear } = useSearch();
-  const selectedDocument = form.selectedDocument;
+  const { scope, selectedDocument } = useSearchSelection();
+  const { searchState, retrySearch, clear } = useSearchExecution();
   const [showFullText, setShowFullText] = useState(false);
 
   const documentChunks = usePaginatedQuery(
@@ -28,7 +28,7 @@ export function SearchResultsController() {
   const questionResult =
     searchState.status === "success" ? searchState.questionResult : null;
   const showDocumentChunks =
-    form.scope === "file" &&
+    scope === "file" &&
     selectedDocument &&
     documentChunks.status !== "LoadingFirstPage" &&
     searchState.status === "idle";

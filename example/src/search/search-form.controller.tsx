@@ -17,7 +17,7 @@ export interface SearchRequest {
   searchType: SearchType;
 }
 
-export function useSearchFormController() {
+export function useSearchSelectionController() {
   const [scope, setScope] = useState<SearchScope>("general");
   const [searchGlobal, setSearchGlobal] = useState(true);
   const [categorySearchGlobal, setCategorySearchGlobal] = useState(true);
@@ -25,25 +25,6 @@ export function useSearchFormController() {
   const [selectedDocument, setSelectedDocument] = useState<PublicFile | null>(
     null,
   );
-  const [limit, setLimit] = useState(10);
-  const [chunksBefore, setChunksBefore] = useState(1);
-  const [chunksAfter, setChunksAfter] = useState(1);
-  const [searchType, setSearchType] = useState<SearchType>("vector");
-  const [categories, setCategories] = useState<string[]>([]);
-
-  const buildSearchRequest = (query: string): SearchRequest => ({
-    query,
-    scope,
-    searchGlobal,
-    categorySearchGlobal,
-    selectedCategory,
-    selectedDocument,
-    limit,
-    chunksBefore,
-    chunksAfter,
-    searchType,
-  });
-
   const handleFileSelect = (file: PublicFile | null) => {
     setSelectedDocument(file);
     if (file) setScope("file");
@@ -70,6 +51,19 @@ export function useSearchFormController() {
     selectedCategory,
     setSelectedCategory,
     selectedDocument,
+    handleFileSelect,
+    handleCategorySelect,
+    handleSearchTypeChange,
+  };
+}
+
+export function useSearchOptionsController() {
+  const [limit, setLimit] = useState(10);
+  const [chunksBefore, setChunksBefore] = useState(1);
+  const [chunksAfter, setChunksAfter] = useState(1);
+  const [searchType, setSearchType] = useState<SearchType>("vector");
+
+  return {
     limit,
     setLimit,
     chunksBefore,
@@ -78,11 +72,14 @@ export function useSearchFormController() {
     setChunksAfter,
     searchType,
     setSearchType,
+  };
+}
+
+export function useSearchCategoriesController() {
+  const [categories, setCategories] = useState<string[]>([]);
+
+  return {
     categories,
     setCategories,
-    buildSearchRequest,
-    handleFileSelect,
-    handleCategorySelect,
-    handleSearchTypeChange,
   };
 }

@@ -2,49 +2,22 @@ import type { SearchType } from "@convex-dev/rag";
 import { useState } from "react";
 import type { PublicFile } from "../../convex/rag/engine";
 import type { QueryMode } from "../search/search.controller";
-import { useSearch } from "../search/search.context";
+import {
+  useSearchCategories,
+  useSearchExecution,
+  useSearchOptions,
+  useSearchSelection,
+} from "../search/search.context";
 import type { SearchScope } from "../search/search-form.controller";
 
 export function SearchInterface() {
-  const { form, search, searchState, setScope, setCurrentNamespaceGlobal } =
-    useSearch();
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const isLoading = searchState.status === "loading";
-
   return (
     <div className="bg-white/90 backdrop-blur-sm border-b border-zinc-200/50 p-6 shadow-sm">
       <SearchHeader />
-      <ScopeControls
-        scope={form.scope}
-        onScopeChange={setScope}
-        selectedDocument={form.selectedDocument}
-        searchGlobal={form.searchGlobal}
-        categorySearchGlobal={form.categorySearchGlobal}
-        onNamespaceChange={setCurrentNamespaceGlobal}
-      />
-      {form.scope === "category" && (
-        <CategorySelect
-          value={form.selectedCategory}
-          onChange={form.setSelectedCategory}
-          categories={form.categories}
-        />
-      )}
-      <QueryBox
-        onSearch={search}
-        isLoading={isLoading}
-      />
-      <AdvancedOptions
-        open={showAdvanced}
-        setOpen={setShowAdvanced}
-        searchType={form.searchType}
-        setSearchType={form.setSearchType}
-        limit={form.limit}
-        setLimit={form.setLimit}
-        chunksBefore={form.chunksBefore}
-        setChunksBefore={form.setChunksBefore}
-        chunksAfter={form.chunksAfter}
-        setChunksAfter={form.setChunksAfter}
-      />
+      <SearchScopeControls />
+      <SearchCategorySelect />
+      <SearchQueryBox />
+      <SearchAdvancedOptions />
     </div>
   );
 }
@@ -76,6 +49,82 @@ function SearchHeader() {
         </p>
       </div>
     </div>
+  );
+}
+
+function SearchScopeControls() {
+  const {
+    scope,
+    setScope,
+    selectedDocument,
+    searchGlobal,
+    categorySearchGlobal,
+    setCurrentNamespaceGlobal,
+  } = useSearchSelection();
+
+  return (
+    <ScopeControls
+      scope={scope}
+      onScopeChange={setScope}
+      selectedDocument={selectedDocument}
+      searchGlobal={searchGlobal}
+      categorySearchGlobal={categorySearchGlobal}
+      onNamespaceChange={setCurrentNamespaceGlobal}
+    />
+  );
+}
+
+function SearchCategorySelect() {
+  const { scope, selectedCategory, setSelectedCategory } = useSearchSelection();
+  const { categories } = useSearchCategories();
+
+  if (scope !== "category") {
+    return null;
+  }
+
+  return (
+    <CategorySelect
+      value={selectedCategory}
+      onChange={setSelectedCategory}
+      categories={categories}
+    />
+  );
+}
+
+function SearchQueryBox() {
+  const { search, searchState } = useSearchExecution();
+
+  return (
+    <QueryBox onSearch={search} isLoading={searchState.status === "loading"} />
+  );
+}
+
+function SearchAdvancedOptions() {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const {
+    searchType,
+    setSearchType,
+    limit,
+    setLimit,
+    chunksBefore,
+    setChunksBefore,
+    chunksAfter,
+    setChunksAfter,
+  } = useSearchOptions();
+
+  return (
+    <AdvancedOptions
+      open={showAdvanced}
+      setOpen={setShowAdvanced}
+      searchType={searchType}
+      setSearchType={setSearchType}
+      limit={limit}
+      setLimit={setLimit}
+      chunksBefore={chunksBefore}
+      setChunksBefore={setChunksBefore}
+      chunksAfter={chunksAfter}
+      setChunksAfter={setChunksAfter}
+    />
   );
 }
 

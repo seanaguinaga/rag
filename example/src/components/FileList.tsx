@@ -32,7 +32,10 @@ function getErrorMessage(error: unknown) {
   return String(error);
 }
 
-function selectOnKeyboard(event: KeyboardEvent<HTMLElement>, select: () => void) {
+function selectOnKeyboard(
+  event: KeyboardEvent<HTMLElement>,
+  select: () => void,
+) {
   if (event.key !== "Enter" && event.key !== " ") {
     return;
   }
@@ -262,6 +265,121 @@ function IngestionJobCard({
   );
 }
 
+interface FileRowProps {
+  doc: PublicFile;
+  globalNamespace: boolean;
+  isSelected: boolean;
+  onSelect: (file: PublicFile) => void;
+  onCategorySelect: (category: string) => void;
+  onDelete: (doc: PublicFile) => void;
+}
+
+function FileRow({
+  doc,
+  globalNamespace,
+  isSelected,
+  onSelect,
+  onCategorySelect,
+  onDelete,
+}: FileRowProps) {
+  const selectedClass = globalNamespace
+    ? "bg-gradient-to-r from-blue-50 to-violet-50 border-2 border-blue-200 shadow-lg"
+    : "bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 shadow-lg";
+  const categoryClass = globalNamespace
+    ? "text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200"
+    : "text-emerald-600 hover:text-emerald-800 bg-emerald-100 hover:bg-emerald-200";
+  const select = () => onSelect({ ...doc, global: globalNamespace });
+
+  return (
+    <div
+      className={`group relative p-4 rounded-xl transition-all duration-300 hover:shadow-md ${
+        isSelected
+          ? selectedClass
+          : "bg-white/60 backdrop-blur-sm border border-zinc-200/50 hover:bg-white/80"
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <div
+          className="flex-1 min-w-0 cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onClick={select}
+          onKeyDown={(event) => selectOnKeyboard(event, select)}
+        >
+          <div className="flex items-center gap-x-3">
+            <div className="size-8 bg-gradient-to-r from-zinc-500 to-zinc-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg
+                className="size-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold text-zinc-900 truncate">
+                {doc.filename}
+              </div>
+              {doc.category && (
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onCategorySelect(doc.category!);
+                  }}
+                  className={`inline-flex items-center text-xs px-2 py-1 rounded-full transition-colors duration-200 mt-1 ${categoryClass}`}
+                >
+                  <svg
+                    className="size-3 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                    />
+                  </svg>
+                  {doc.category}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete(doc);
+          }}
+          className="ml-3 p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
+          title="Delete entry"
+        >
+          <svg
+            className="size-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function FileList({
   onFileSelect,
   onCategorySelect,
@@ -436,96 +554,18 @@ export function FileList({
         </div>
         <div className="space-y-3">
           {globalFiles?.results?.map((doc) => (
-            <div
+            <FileRow
               key={doc.entryId}
-              className={`group relative p-4 rounded-xl transition-all duration-300 hover:shadow-md ${
-                selectedDocument?.filename === doc.filename &&
+              doc={doc}
+              globalNamespace={true}
+              isSelected={
+                selectedDocument?.entryId === doc.entryId &&
                 selectedDocument?.global === true
-                  ? "bg-gradient-to-r from-blue-50 to-violet-50 border-2 border-blue-200 shadow-lg"
-                  : "bg-white/60 backdrop-blur-sm border border-zinc-200/50 hover:bg-white/80"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div
-                  className="flex-1 min-w-0 cursor-pointer"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => onFileSelect(doc)}
-                  onKeyDown={(event) =>
-                    selectOnKeyboard(event, () => onFileSelect(doc))
-                  }
-                >
-                  <div className="flex items-center gap-x-3">
-                    <div className="size-8 bg-gradient-to-r from-zinc-500 to-zinc-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg
-                        className="size-4 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-zinc-900 truncate">
-                        {doc.filename}
-                      </div>
-                      {doc.category && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onCategorySelect(doc.category!);
-                          }}
-                          className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded-full transition-colors duration-200 mt-1"
-                        >
-                          <svg
-                            className="size-3 mr-1"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                            />
-                          </svg>
-                          {doc.category}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(doc);
-                  }}
-                  className="ml-3 p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
-                  title="Delete entry"
-                >
-                  <svg
-                    className="size-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
+              }
+              onSelect={onFileSelect}
+              onCategorySelect={onCategorySelect}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       </div>
@@ -573,98 +613,18 @@ export function FileList({
         </div>
         <div className="space-y-3">
           {userFiles?.results?.map((doc) => (
-            <div
+            <FileRow
               key={doc.entryId}
-              className={`group relative p-4 rounded-xl transition-all duration-300 hover:shadow-md ${
-                selectedDocument?.filename === doc.filename &&
+              doc={doc}
+              globalNamespace={false}
+              isSelected={
+                selectedDocument?.entryId === doc.entryId &&
                 selectedDocument?.global === false
-                  ? "bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 shadow-lg"
-                  : "bg-white/60 backdrop-blur-sm border border-zinc-200/50 hover:bg-white/80"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div
-                  className="flex-1 min-w-0 cursor-pointer"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => onFileSelect({ ...doc, global: false })}
-                  onKeyDown={(event) =>
-                    selectOnKeyboard(event, () =>
-                      onFileSelect({ ...doc, global: false }),
-                    )
-                  }
-                >
-                  <div className="flex items-center gap-x-3">
-                    <div className="size-8 bg-gradient-to-r from-zinc-500 to-zinc-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg
-                        className="size-4 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-zinc-900 truncate">
-                        {doc.filename}
-                      </div>
-                      {doc.category && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onCategorySelect(doc.category!);
-                          }}
-                          className="inline-flex items-center text-xs text-emerald-600 hover:text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2 py-1 rounded-full transition-colors duration-200 mt-1"
-                        >
-                          <svg
-                            className="size-3 mr-1"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                            />
-                          </svg>
-                          {doc.category}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(doc);
-                  }}
-                  className="ml-3 p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
-                  title="Delete entry"
-                >
-                  <svg
-                    className="size-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
+              }
+              onSelect={onFileSelect}
+              onCategorySelect={onCategorySelect}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       </div>
