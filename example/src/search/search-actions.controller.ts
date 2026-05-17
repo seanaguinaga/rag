@@ -7,11 +7,15 @@ import type { SearchRequest } from "./search-form.controller";
 import { toUiSearchResult } from "./search-response.controller";
 
 type ConvexClient = ReturnType<typeof useConvex>;
+type SearchActionSuccess = Omit<
+  Extract<SearchState, { status: "success" }>,
+  "request"
+>;
 
 export async function runQuestionAction(
   convex: ConvexClient,
   request: SearchRequest,
-): Promise<Extract<SearchState, { status: "success" }>> {
+): Promise<SearchActionSuccess> {
   const questionResults = await convex.action(api.rag.answering.askQuestion, {
     prompt: request.query,
     globalNamespace: getQuestionNamespace(request),
@@ -40,7 +44,7 @@ export async function runQuestionAction(
 export async function runSearchAction(
   convex: ConvexClient,
   request: SearchRequest,
-): Promise<Extract<SearchState, { status: "success" }>> {
+): Promise<SearchActionSuccess> {
   const chunkContext = {
     before: request.chunksBefore,
     after: request.chunksAfter,

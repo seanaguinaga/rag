@@ -7,7 +7,12 @@ import {
 
 export function useSearchController() {
   const form = useSearchFormController();
-  const { state: searchState, runSearch, clearSearch } = useRagSearch();
+  const {
+    state: searchState,
+    runSearch,
+    retrySearch,
+    clearSearch,
+  } = useRagSearch();
   const {
     buildSearchRequest,
     handleCategorySelect,
@@ -19,8 +24,8 @@ export function useSearchController() {
     setSearchGlobal,
   } = form;
 
-  const search = (mode: QueryMode) => {
-    void runSearch(mode, buildSearchRequest());
+  const search = (mode: QueryMode, query: string) => {
+    void runSearch(mode, buildSearchRequest(query));
   };
 
   const clear = () => {
@@ -60,6 +65,7 @@ export function useSearchController() {
     form,
     searchState,
     search,
+    retrySearch,
     clear,
     setScope,
     selectFile,

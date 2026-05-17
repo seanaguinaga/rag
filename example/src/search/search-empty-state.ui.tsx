@@ -1,8 +1,8 @@
-import type { QueryMode, SearchState } from "./search.controller";
+import type { SearchState } from "./search.controller";
 
 interface SearchEmptyStateUiProps {
   state: SearchState;
-  onRetry: (mode: QueryMode) => void;
+  onRetry: () => void;
   onClear: () => void;
 }
 
@@ -51,7 +51,7 @@ export function SearchEmptyStateUi({
           <div className="flex justify-center gap-3">
             <button
               type="button"
-              onClick={() => onRetry(state.mode)}
+              onClick={onRetry}
               className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-colors duration-200"
             >
               Retry

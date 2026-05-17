@@ -8,7 +8,7 @@ import { SearchEmptyStateUi } from "./search-empty-state.ui";
 import { SearchResultsUi } from "./search-results.ui";
 
 export function SearchResultsController() {
-  const { form, searchState, search, clear } = useSearch();
+  const { form, searchState, retrySearch, clear } = useSearch();
   const selectedDocument = form.selectedDocument;
   const [showFullText, setShowFullText] = useState(false);
 
@@ -59,7 +59,7 @@ export function SearchResultsController() {
       {showEmptyState && (
         <SearchEmptyStateUi
           state={searchState}
-          onRetry={search}
+          onRetry={retrySearch}
           onClear={clear}
         />
       )}

@@ -18,7 +18,6 @@ export interface SearchRequest {
 }
 
 export function useSearchFormController() {
-  const [query, setQuery] = useState("");
   const [scope, setScope] = useState<SearchScope>("general");
   const [searchGlobal, setSearchGlobal] = useState(true);
   const [categorySearchGlobal, setCategorySearchGlobal] = useState(true);
@@ -32,7 +31,7 @@ export function useSearchFormController() {
   const [searchType, setSearchType] = useState<SearchType>("vector");
   const [categories, setCategories] = useState<string[]>([]);
 
-  const buildSearchRequest = (): SearchRequest => ({
+  const buildSearchRequest = (query: string): SearchRequest => ({
     query,
     scope,
     searchGlobal,
@@ -62,8 +61,6 @@ export function useSearchFormController() {
   };
 
   return {
-    query,
-    setQuery,
     scope,
     setScope,
     searchGlobal,

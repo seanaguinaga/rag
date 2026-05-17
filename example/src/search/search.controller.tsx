@@ -11,10 +11,11 @@ export type QueryMode = "search" | "question";
 
 export type SearchState =
   | { status: "idle" }
-  | { status: "loading"; mode: QueryMode }
+  | { status: "loading"; mode: QueryMode; request: SearchRequest }
   | {
       status: "success";
       mode: QueryMode;
+      request: SearchRequest;
       searchResults: UISearchResult;
       questionResult: {
         answer: string;
@@ -22,7 +23,12 @@ export type SearchState =
         files: UISearchResult["files"];
       } | null;
     }
-  | { status: "error"; mode: QueryMode; message: string };
+  | {
+      status: "error";
+      mode: QueryMode;
+      request: SearchRequest;
+      message: string;
+    };
 
 export function useRagSearch() {
   const convex = useConvex();
@@ -45,7 +51,7 @@ export function useRagSearch() {
       return;
     }
 
-    setState({ status: "loading", mode });
+    setState({ status: "loading", mode, request });
 
     try {
       const nextState =
@@ -53,21 +59,30 @@ export function useRagSearch() {
           ? await runQuestionAction(convex, request)
           : await runSearchAction(convex, request);
 
-      setState(nextState);
+      setState({ ...nextState, request });
     } catch (error) {
       console.error("Search/Question failed:", error);
       setState({
         status: "error",
         mode,
+        request,
         message: `${mode === "question" ? "Question" : "Search"} failed. ${getErrorMessage(error)}`,
       });
     }
+  };
+
+  const retrySearch = () => {
+    if (state.status !== "error") {
+      return;
+    }
+    void runSearch(state.mode, state.request);
   };
 
   return {
     state,
     isLoading: state.status === "loading",
     runSearch,
+    retrySearch,
     clearSearch,
   };
 }
@@ -84,6 +99,7 @@ function validateSearchRequest(
     return {
       status: "error",
       mode,
+      request,
       message: "Please select a file to search.",
     };
   }
@@ -92,6 +108,7 @@ function validateSearchRequest(
     return {
       status: "error",
       mode,
+      request,
       message: "Please select a category for category search.",
     };
   }

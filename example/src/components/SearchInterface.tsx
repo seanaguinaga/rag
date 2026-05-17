@@ -30,8 +30,6 @@ export function SearchInterface() {
         />
       )}
       <QueryBox
-        query={form.query}
-        setQuery={form.setQuery}
         onSearch={search}
         isLoading={isLoading}
       />
@@ -225,16 +223,13 @@ function CategorySelect({
 }
 
 function QueryBox({
-  query,
-  setQuery,
   onSearch,
   isLoading,
 }: {
-  query: string;
-  setQuery: (query: string) => void;
-  onSearch: (mode: QueryMode) => void;
+  onSearch: (mode: QueryMode, query: string) => void;
   isLoading: boolean;
 }) {
+  const [query, setQuery] = useState("");
   const disabled = isLoading || !query.trim();
 
   return (
@@ -246,7 +241,9 @@ function QueryBox({
         onKeyDown={(event) => {
           if (event.key === "Enter") {
             event.preventDefault();
-            onSearch("search");
+            if (!disabled) {
+              onSearch("search", query);
+            }
           }
         }}
         placeholder="Enter your search query or question..."
@@ -254,7 +251,7 @@ function QueryBox({
       />
       <div className="absolute right-2 top-2 bottom-2 flex gap-x-2">
         <button
-          onClick={() => onSearch("search")}
+          onClick={() => onSearch("search", query)}
           disabled={disabled}
           className={`px-4 text-white rounded-lg font-semibold transition-all duration-300 ${
             disabled
@@ -265,7 +262,7 @@ function QueryBox({
           <span>🔍</span>
         </button>
         <button
-          onClick={() => onSearch("question")}
+          onClick={() => onSearch("question", query)}
           disabled={disabled}
           className={`px-4 text-white rounded-lg font-semibold transition-all duration-300 ${
             disabled
