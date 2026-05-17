@@ -1,4 +1,3 @@
-import { createContext, type ReactNode, useContext } from "react";
 import type { PublicFile } from "../../convex/rag/engine";
 import { type QueryMode, useRagSearch } from "./search.controller";
 import {
@@ -6,11 +5,7 @@ import {
   useSearchFormController,
 } from "./search-form.controller";
 
-type SearchContextValue = ReturnType<typeof useSearchController>;
-
-const SearchContext = createContext<SearchContextValue | null>(null);
-
-function useSearchController() {
+export function useSearchController() {
   const form = useSearchFormController();
   const { state: searchState, runSearch, clearSearch } = useRagSearch();
   const {
@@ -72,20 +67,4 @@ function useSearchController() {
     selectSidebarScope,
     setCurrentNamespaceGlobal,
   };
-}
-
-export function SearchProvider({ children }: { children: ReactNode }) {
-  const search = useSearchController();
-
-  return (
-    <SearchContext.Provider value={search}>{children}</SearchContext.Provider>
-  );
-}
-
-export function useSearch() {
-  const context = useContext(SearchContext);
-  if (!context) {
-    throw new Error("useSearch must be used within SearchProvider");
-  }
-  return context;
 }

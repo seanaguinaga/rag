@@ -1,5 +1,4 @@
 import { EntryId, vEntryId } from "@convex-dev/rag";
-import { assert } from "convex-helpers";
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { Doc } from "../_generated/dataModel";

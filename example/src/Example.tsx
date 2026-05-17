@@ -2,8 +2,8 @@ import "./Example.css";
 import { SearchInterface } from "./components/SearchInterface";
 import { UploadSection } from "./components/UploadSection";
 import { ErrorBoundaryUi } from "./search/error-boundary.ui";
-import { SearchProvider } from "./search/search.context";
 import { SearchFileListController } from "./search/search-file-list.controller";
+import { SearchProvider } from "./search/search.provider";
 import { SearchResultsController } from "./search/search-results.controller";
 
 function ExampleContent() {
