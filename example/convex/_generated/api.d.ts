@@ -15,9 +15,10 @@ import type * as http from "../http.js";
 import type * as rag_answering from "../rag/answering.js";
 import type * as rag_config from "../rag/config.js";
 import type * as rag_embeddings from "../rag/embeddings.js";
+import type * as rag_engine from "../rag/engine.js";
 import type * as rag_indexing from "../rag/indexing.js";
-import type * as rag_rag from "../rag/rag.js";
 import type * as rag_sources from "../rag/sources.js";
+import type * as rag_workflow from "../rag/workflow.js";
 
 import type {
   ApiFromModules,
@@ -33,9 +34,10 @@ declare const fullApi: ApiFromModules<{
   "rag/answering": typeof rag_answering;
   "rag/config": typeof rag_config;
   "rag/embeddings": typeof rag_embeddings;
+  "rag/engine": typeof rag_engine;
   "rag/indexing": typeof rag_indexing;
-  "rag/rag": typeof rag_rag;
   "rag/sources": typeof rag_sources;
+  "rag/workflow": typeof rag_workflow;
 }>;
 
 /**
@@ -66,4 +68,5 @@ export declare const internal: FilterApi<
 
 export declare const components: {
   rag: import("@convex-dev/rag/_generated/component.js").ComponentApi<"rag">;
+  ragWorkflow: import("@convex-dev/workflow/_generated/component.js").ComponentApi<"ragWorkflow">;
 };

@@ -1,4 +1,5 @@
 import { Entry, RAG, SearchEntry, vSearchType } from "@convex-dev/rag";
+import { type WorkflowId } from "@convex-dev/workflow";
 import { assert } from "convex-helpers";
 import { embed } from "ai";
 import { components } from "../_generated/api";
@@ -9,7 +10,13 @@ import { GOOGLE_EMBEDDING_DIMENSIONS } from "./config";
 import { documentEmbeddingModel, queryEmbeddingModel } from "./embeddings";
 
 export type Filters = { filename: string; category: string | null };
-export type Metadata = { storageId: Id<"_storage">; uploadedBy: string };
+export type Metadata = {
+  storageId: Id<"_storage">;
+  uploadedBy: string;
+  mimeType?: string;
+  ingestionJobId?: Id<"ingestionJobs">;
+  workflowId?: WorkflowId;
+};
 export type PublicFile = Awaited<ReturnType<typeof toFile>>;
 
 export const ragEngine = new RAG<Filters, Metadata>(components.rag, {
@@ -46,8 +53,6 @@ export async function toFile(
 ) {
   assert(entry.metadata, "Entry metadata not found");
   const storageId = entry.metadata.storageId;
-  const storageMetadata = await ctx.storage.getMetadata(storageId);
-  assert(storageMetadata, "Storage metadata not found");
   return {
     entryId: entry.entryId,
     filename: entry.key!,
@@ -56,7 +61,7 @@ export async function toFile(
     category:
       entry.filterValues.find((f) => f.name === "category")?.value ?? undefined,
     title: entry.title,
-    isImage: storageMetadata.contentType?.startsWith("image/") ?? false,
+    isImage: entry.metadata.mimeType?.startsWith("image/") ?? false,
     url: await ctx.storage.getUrl(storageId),
   };
 }

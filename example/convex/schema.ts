@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
 import { vEntryId } from "@convex-dev/rag";
+import { v } from "convex/values";
+import { ingestionJobs } from "./rag/schema";
 
 export default defineSchema({
   // We can use a table with extra metadata to track extra things
@@ -14,5 +15,6 @@ export default defineSchema({
   })
     .index("global_category", ["global", "category"])
     .index("entryId", ["entryId"]),
+  ingestionJobs,
   // Any tables used by the example app go here.
 });

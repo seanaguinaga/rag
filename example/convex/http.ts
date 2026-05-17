@@ -2,6 +2,7 @@ import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server.js";
 import { addFileAsync } from "./rag/indexing.js";
 import { corsRouter } from "convex-helpers/server/cors";
+import { ConvexError } from "convex/values";
 
 const cors = corsRouter(httpRouter(), {
   allowedHeaders: [
@@ -16,13 +17,31 @@ cors.route({
   path: "/upload",
   method: "POST",
   handler: httpAction(async (ctx, request) => {
-    await addFileAsync(ctx, {
-      globalNamespace: Boolean(request.headers.get("x-global-namespace")),
-      filename: request.headers.get("x-filename")!,
-      blob: await request.blob(),
-      category: request.headers.get("x-category") || null,
-    });
-    return new Response();
+    try {
+      await addFileAsync(ctx, {
+        globalNamespace: Boolean(request.headers.get("x-global-namespace")),
+        filename: request.headers.get("x-filename")!,
+        blob: await request.blob(),
+        category: request.headers.get("x-category") || null,
+      });
+      return new Response();
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        return Response.json(
+          { error: error.data },
+          {
+            status: 400,
+          },
+        );
+      }
+      console.error("Upload failed:", error);
+      return Response.json(
+        { error: { message: "Upload failed." } },
+        {
+          status: 500,
+        },
+      );
+    }
   }),
 });
 

@@ -4,7 +4,7 @@ import { usePaginatedQuery } from "convex-helpers/react";
 import { api } from "../convex/_generated/api";
 import { useCallback, useState, useEffect } from "react";
 import type { EntryFilter, SearchResult, SearchType } from "@convex-dev/rag";
-import type { Filters, PublicFile } from "../convex/rag/rag";
+import type { Filters, PublicFile } from "../convex/rag/engine";
 import { MarkdownRenderer } from "./MarkdownRenderer";
 import { UploadSection } from "./components/UploadSection";
 import { FileList } from "./components/FileList";

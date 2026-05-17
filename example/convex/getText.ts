@@ -4,27 +4,44 @@ import { assert } from "convex-helpers";
 import { Id } from "./_generated/dataModel";
 import { StorageActionWriter } from "convex/server";
 import { GOOGLE_EXTRACTION_MODEL_ID } from "./rag/config";
+import { ConvexError } from "convex/values";
 
 const extractionModel = google(GOOGLE_EXTRACTION_MODEL_ID);
 
-function getContentType(mimeType: string) {
+function unsupportedMimeTypeError(mimeType: string) {
+  return new ConvexError({
+    code: "UNSUPPORTED_MIME_TYPE",
+    message: `Unsupported file type: ${mimeType}. Supported types are images, audio, PDFs, and text files.`,
+    mimeType,
+  });
+}
+
+export function getContentType(mimeType: string) {
   const lowerMimeType = mimeType.toLowerCase();
 
   if (
-    ["image/jpeg", "image/png", "image/webp", "image/gif"].includes(mimeType)
+    ["image/jpeg", "image/png", "image/webp", "image/gif"].includes(
+      lowerMimeType,
+    )
   ) {
-    return "image";
+    return "image" as const;
   }
-  if (mimeType.startsWith("audio/")) {
-    return "audio";
+  if (lowerMimeType.startsWith("audio/")) {
+    return "audio" as const;
   }
   if (lowerMimeType.includes("pdf")) {
-    return "pdf";
+    return "pdf" as const;
   }
   if (lowerMimeType.includes("text")) {
-    return "text";
+    return "text" as const;
   }
-  return "unsupported";
+  return "unsupported" as const;
+}
+
+export function assertSupportedMimeType(mimeType: string) {
+  if (getContentType(mimeType) === "unsupported") {
+    throw unsupportedMimeTypeError(mimeType);
+  }
 }
 
 async function extractTextFromImage(url: string) {
@@ -156,8 +173,7 @@ export async function getText(
       return await extractTextFromPdf({ url, mimeType, filename });
     case "text":
       return await extractTextFromTextFile({ ctx, storageId, bytes, mimeType });
-    default: {
-      throw new Error(`Unsupported mime type: ${mimeType}`);
-    }
+    default:
+      throw unsupportedMimeTypeError(mimeType);
   }
 }

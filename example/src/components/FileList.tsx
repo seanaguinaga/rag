@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "react";
 import { useConvex, useQuery } from "convex/react";
 import { usePaginatedQuery } from "convex-helpers/react";
 import { api } from "../../convex/_generated/api";
-import type { PublicFile } from "../../convex/rag/rag";
+import type { PublicFile } from "../../convex/rag/engine";
 
 interface FileListProps {
   onFileSelect: (file: PublicFile | null) => void;
@@ -10,6 +10,27 @@ interface FileListProps {
   onSearchTypeChange: (type: "general", global: boolean) => void;
   onCategoriesChange: (categories: string[]) => void;
   selectedDocument: PublicFile | null;
+}
+
+type PublicIngestionJob =
+  (typeof api.rag.sources.listIngestionJobs)["_returnType"]["page"][number];
+
+function getErrorMessage(error: unknown) {
+  if (
+    error &&
+    typeof error === "object" &&
+    "data" in error &&
+    error.data &&
+    typeof error.data === "object" &&
+    "message" in error.data &&
+    typeof error.data.message === "string"
+  ) {
+    return error.data.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
 }
 
 function PendingDocumentProgress({ doc }: { doc: PublicFile }) {
@@ -121,6 +142,119 @@ function PendingDocumentProgress({ doc }: { doc: PublicFile }) {
   );
 }
 
+function IngestionJobCard({
+  job,
+  onRetry,
+  onDismiss,
+}: {
+  job: PublicIngestionJob;
+  onRetry: (job: PublicIngestionJob) => void;
+  onDismiss: (job: PublicIngestionJob) => void;
+}) {
+  const isProcessing = job.status === "processing";
+
+  return (
+    <div
+      className={`group relative p-4 border-2 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl ${
+        isProcessing
+          ? "bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200"
+          : "bg-gradient-to-r from-red-50 to-rose-50 border-red-200"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center space-x-3">
+            <div
+              className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                isProcessing
+                  ? "bg-gradient-to-r from-orange-500 to-amber-500"
+                  : "bg-gradient-to-r from-red-500 to-rose-500"
+              }`}
+            >
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v2m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z"
+                />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div
+                className={`text-sm font-semibold truncate ${
+                  isProcessing ? "text-orange-950" : "text-red-950"
+                }`}
+              >
+                {job.filename}
+              </div>
+              {job.category && (
+                <div
+                  className={`text-xs font-medium px-2 py-1 rounded-full inline-block mt-1 ${
+                    isProcessing
+                      ? "text-orange-700 bg-orange-100"
+                      : "text-red-700 bg-red-100"
+                  }`}
+                >
+                  {job.category}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="mt-3 space-y-2">
+            {job.status === "failed" && job.error && (
+              <div className="text-xs text-red-700 line-clamp-3">
+                {job.error}
+              </div>
+            )}
+            <div
+              className={`flex items-center gap-2 text-xs ${
+                isProcessing ? "text-orange-600" : "text-red-600"
+              }`}
+            >
+              <span
+                className={`px-2 py-1 rounded-full font-medium ${
+                  isProcessing ? "bg-orange-100" : "bg-red-100"
+                }`}
+              >
+                {job.global ? "Shared" : "User"}
+              </span>
+              <span
+                className={`px-2 py-1 rounded-full font-medium ${
+                  isProcessing ? "bg-orange-100" : "bg-red-100"
+                }`}
+              >
+                {isProcessing ? "Processing..." : `Failed ${job.attempts}x`}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={() => onRetry(job)}
+            disabled={isProcessing}
+            className="px-3 py-1.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed rounded-lg transition-colors duration-200"
+          >
+            Retry
+          </button>
+          <button
+            onClick={() => onDismiss(job)}
+            disabled={isProcessing}
+            className="px-3 py-1.5 text-xs font-semibold text-red-700 bg-white/80 hover:bg-red-100 disabled:text-red-300 disabled:cursor-not-allowed rounded-lg transition-colors duration-200"
+          >
+            Dismiss
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function FileList({
   onFileSelect,
   onCategorySelect,
@@ -147,6 +281,11 @@ export function FileList({
   );
 
   const pendingFiles = useQuery(api.rag.sources.listPendingFiles);
+  const ingestionJobs = usePaginatedQuery(
+    api.rag.sources.listIngestionJobs,
+    {},
+    { initialNumItems: 10 },
+  );
 
   const handleDelete = useCallback(
     async (doc: PublicFile) => {
@@ -167,6 +306,34 @@ export function FileList({
       }
     },
     [convex, selectedDocument, onFileSelect],
+  );
+
+  const handleRetryJob = useCallback(
+    async (job: PublicIngestionJob) => {
+      try {
+        await convex.action(api.rag.indexing.retryIngestionJob, {
+          jobId: job._id,
+        });
+      } catch (retryError) {
+        console.error("Retry failed:", retryError);
+        alert(`Retry failed. ${getErrorMessage(retryError)}`);
+      }
+    },
+    [convex],
+  );
+
+  const handleDismissJob = useCallback(
+    async (job: PublicIngestionJob) => {
+      try {
+        await convex.mutation(api.rag.sources.dismissIngestionJob, {
+          jobId: job._id,
+        });
+      } catch (dismissError) {
+        console.error("Dismiss failed:", dismissError);
+        alert(`Failed to dismiss error. ${getErrorMessage(dismissError)}`);
+      }
+    },
+    [convex],
   );
 
   useEffect(() => {
@@ -196,6 +363,34 @@ export function FileList({
             {pendingFiles.map((doc) => (
               <PendingDocumentProgress key={doc.entryId} doc={doc} />
             ))}
+          </div>
+        </div>
+      )}
+
+      {ingestionJobs.results.length > 0 && (
+        <div className="p-6 border-b border-gray-200/50">
+          <div className="space-y-3">
+            <div className="flex items-center mb-4">
+              <h4 className="text-sm font-semibold text-red-800">
+                Ingestion queue ({ingestionJobs.results.length})
+              </h4>
+            </div>
+            {ingestionJobs.results.map((job) => (
+              <IngestionJobCard
+                key={job._id}
+                job={job}
+                onRetry={handleRetryJob}
+                onDismiss={handleDismissJob}
+              />
+            ))}
+            {ingestionJobs.status === "CanLoadMore" && (
+              <button
+                onClick={() => ingestionJobs.loadMore(10)}
+                className="w-full px-3 py-2 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors duration-200"
+              >
+                Load more
+              </button>
+            )}
           </div>
         </div>
       )}

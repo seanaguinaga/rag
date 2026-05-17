@@ -11,6 +11,53 @@ interface UploadSectionProps {
   onFileUploaded?: () => void;
 }
 
+function getErrorMessage(error: unknown) {
+  if (
+    error &&
+    typeof error === "object" &&
+    "data" in error &&
+    error.data &&
+    typeof error.data === "object" &&
+    "message" in error.data &&
+    typeof error.data.message === "string"
+  ) {
+    return error.data.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+}
+
+function getUploadErrorMessage(payload: unknown) {
+  if (
+    payload &&
+    typeof payload === "object" &&
+    "error" in payload &&
+    payload.error &&
+    typeof payload.error === "object" &&
+    "message" in payload.error &&
+    typeof payload.error.message === "string"
+  ) {
+    return payload.error.message;
+  }
+  return "Upload failed.";
+}
+
+async function assertUploadSucceeded(response: Response) {
+  if (response.ok) {
+    return;
+  }
+  try {
+    throw new Error(getUploadErrorMessage(await response.json()));
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error(`Upload failed with status ${response.status}.`);
+    }
+    throw error;
+  }
+}
+
 export function UploadSection({ onFileUploaded }: UploadSectionProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -126,17 +173,22 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
       // Upload original file
       if (selectedFile.size > 512 * 1024) {
         // For big files let's do it asynchronously
-        await fetch(`${import.meta.env.VITE_CONVEX_SITE_URL}/upload`, {
-          method: "POST",
-          headers: {
-            "x-filename": filename,
-            "x-category": uploadForm.category,
-            ...(uploadForm.globalNamespace && {
-              "x-global-namespace": "true",
-            }),
+        const response = await fetch(
+          `${import.meta.env.VITE_CONVEX_SITE_URL}/upload`,
+          {
+            method: "POST",
+            headers: {
+              "x-filename": filename,
+              "x-category": uploadForm.category,
+              ...(blob.type && { "Content-Type": blob.type }),
+              ...(uploadForm.globalNamespace && {
+                "x-global-namespace": "true",
+              }),
+            },
+            body: blob,
           },
-          body: blob,
-        });
+        );
+        await assertUploadSucceeded(response);
       } else {
         await convex.action(api.rag.indexing.addFile, {
           bytes: await blob.arrayBuffer(),
@@ -173,9 +225,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
         filename: prev.filename,
       }));
       setSelectedFile(selectedFile);
-      alert(
-        `Upload failed. ${error instanceof Error ? error.message : String(error)}`,
-      );
+      alert(`Upload failed. ${getErrorMessage(error)}`);
     } finally {
       setIsAdding(false);
     }

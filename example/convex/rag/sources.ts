@@ -1,9 +1,10 @@
 import { EntryId, vEntryId } from "@convex-dev/rag";
 import { assert } from "convex-helpers";
 import { paginationOptsValidator } from "convex/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
+import { Doc } from "../_generated/dataModel";
 import { MutationCtx, mutation, query } from "../_generated/server";
-import { getUserId, ragEngine, toFile } from "./rag";
+import { getUserId, ragEngine, toFile } from "./engine";
 
 export const listFiles = query({
   args: {
@@ -61,11 +62,34 @@ export const listPendingFiles = query({
       }));
 
     const globalFiles =
-      globalResults?.page.map((entry) => toFile(ctx, entry, true)) ?? [];
+      globalResults?.page
+        .filter((entry) => !entry.metadata?.ingestionJobId)
+        .map((entry) => toFile(ctx, entry, true)) ?? [];
     const userFiles =
-      userResults?.page.map((entry) => toFile(ctx, entry, false)) ?? [];
+      userResults?.page
+        .filter((entry) => !entry.metadata?.ingestionJobId)
+        .map((entry) => toFile(ctx, entry, false)) ?? [];
 
     return await Promise.all([...globalFiles, ...userFiles]);
+  },
+});
+
+export const listIngestionJobs = query({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
+    const userId = await getUserId(ctx);
+    if (!userId) throw new Error("Unauthorized");
+
+    const results = await ctx.db
+      .query("ingestionJobs")
+      .withIndex("by_uploadedBy", (q) => q.eq("uploadedBy", userId))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    return {
+      ...results,
+      page: results.page.map(toPublicIngestionJob),
+    };
   },
 });
 
@@ -95,6 +119,31 @@ export const deleteFile = mutation({
   },
 });
 
+export const dismissIngestionJob = mutation({
+  args: { jobId: v.id("ingestionJobs") },
+  handler: async (ctx, args) => {
+    const userId = await getUserId(ctx);
+    if (!userId) throw new Error("Unauthorized");
+
+    const job = await ctx.db.get(args.jobId);
+    if (!job) {
+      return;
+    }
+    if (job.uploadedBy !== userId) {
+      throw new Error("Unauthorized");
+    }
+    if (job.status === "processing") {
+      throw new ConvexError({
+        code: "INGESTION_JOB_PROCESSING",
+        message: "Wait for processing to finish before dismissing this file.",
+      });
+    }
+
+    await ctx.storage.delete(job.storageId);
+    await ctx.db.delete(args.jobId);
+  },
+});
+
 export async function deleteFileByEntryId(ctx: MutationCtx, entryId: EntryId) {
   const file = await ctx.db
     .query("fileMetadata")
@@ -105,4 +154,20 @@ export async function deleteFileByEntryId(ctx: MutationCtx, entryId: EntryId) {
     await ctx.storage.delete(file.storageId);
     await ragEngine.deleteAsync(ctx, { entryId });
   }
+}
+
+function toPublicIngestionJob(job: Doc<"ingestionJobs">) {
+  const fields = {
+    _id: job._id,
+    _creationTime: job._creationTime,
+    filename: job.filename,
+    global: job.global,
+    ...(job.category === undefined ? {} : { category: job.category }),
+    attempts: job.attempts,
+  };
+
+  if (job.status === "failed") {
+    return { ...fields, status: job.status, error: job.error };
+  }
+  return { ...fields, status: job.status };
 }
