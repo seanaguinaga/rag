@@ -18,37 +18,35 @@ export async function extractTextFromPdf(
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
-    let fullText = "";
     const numPages = pdf.numPages;
 
-    // Extract text from all pages
-    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+    const pageTexts = await Promise.all(
+      Array.from({ length: numPages }, async (_, index) => {
+      const pageNum = index + 1;
       const page = await pdf.getPage(pageNum);
       const textContent = await page.getTextContent();
 
       // Combine text items with proper spacing and line breaks
-      const pageText = textContent.items
-        .map((item) => {
+      return textContent.items
+        .reduce<string[]>((parts, item) => {
           if ("str" in item) {
             // Check if this text item is followed by a line break
-            return item.str + (item.hasEOL ? "\n" : "");
+            parts.push(item.str + (item.hasEOL ? "\n" : ""));
           }
-          return "";
-        })
-        .filter(Boolean)
+          return parts;
+        }, [])
         .join(" ")
         .replace(/\s+\n/g, "\n"); // Clean up spaces before newlines
       // .replace(/\n\s+/g, "\n"); // Clean up spaces after newlines
-
-      fullText += pageText + "\n\n";
-    }
+    }),
+    );
 
     // Get metadata
     const metadata = await pdf.getMetadata();
     const info = metadata.info as any;
 
     return {
-      text: fullText.trim(),
+      text: pageTexts.join("\n\n").trim(),
       pages: numPages,
       title: info?.Title,
       author: info?.Author,

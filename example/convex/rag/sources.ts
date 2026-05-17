@@ -38,36 +38,30 @@ export const listPendingFiles = query({
   handler: async (ctx) => {
     const userId = await getUserId(ctx);
     if (!userId) throw new Error("Unauthorized");
-    const globalNamespace = await ragEngine.getNamespace(ctx, {
-      namespace: "global",
-    });
-    const userNamespace = await ragEngine.getNamespace(ctx, {
-      namespace: userId,
-    });
+    const [globalNamespace, userNamespace] = await Promise.all([
+      ragEngine.getNamespace(ctx, { namespace: "global" }),
+      ragEngine.getNamespace(ctx, { namespace: userId }),
+    ]);
     const paginationOpts = { numItems: 10, cursor: null };
-    const globalResults =
-      globalNamespace &&
-      (await ragEngine.list(ctx, {
-        namespaceId: globalNamespace.namespaceId,
-        status: "pending",
-        paginationOpts,
-      }));
-    const userResults =
-      userNamespace &&
-      (await ragEngine.list(ctx, {
-        namespaceId: userNamespace.namespaceId,
-        status: "pending",
-        paginationOpts,
-      }));
+    const [globalResults, userResults] = await Promise.all([
+      globalNamespace
+        ? ragEngine.list(ctx, {
+            namespaceId: globalNamespace.namespaceId,
+            status: "pending",
+            paginationOpts,
+          })
+        : null,
+      userNamespace
+        ? ragEngine.list(ctx, {
+            namespaceId: userNamespace.namespaceId,
+            status: "pending",
+            paginationOpts,
+          })
+        : null,
+    ]);
 
-    const globalFiles =
-      globalResults?.page
-        .filter((entry) => !entry.metadata?.ingestionJobId)
-        .map((entry) => toFile(ctx, entry, true)) ?? [];
-    const userFiles =
-      userResults?.page
-        .filter((entry) => !entry.metadata?.ingestionJobId)
-        .map((entry) => toFile(ctx, entry, false)) ?? [];
+    const globalFiles = pendingFiles(ctx, globalResults?.page ?? [], true);
+    const userFiles = pendingFiles(ctx, userResults?.page ?? [], false);
 
     return await Promise.all([...globalFiles, ...userFiles]);
   },
@@ -149,10 +143,25 @@ export async function deleteFileByEntryId(ctx: MutationCtx, entryId: EntryId) {
     .withIndex("entryId", (q) => q.eq("entryId", entryId))
     .unique();
   if (file) {
-    await ctx.db.delete("fileMetadata", file._id);
-    await ctx.storage.delete(file.storageId);
-    await ragEngine.deleteAsync(ctx, { entryId });
+    await Promise.all([
+      ctx.db.delete("fileMetadata", file._id),
+      ctx.storage.delete(file.storageId),
+      ragEngine.deleteAsync(ctx, { entryId }),
+    ]);
   }
+}
+
+function pendingFiles(
+  ctx: Parameters<typeof toFile>[0],
+  entries: Awaited<ReturnType<typeof ragEngine.list>>["page"],
+  global: boolean,
+) {
+  return entries.reduce<ReturnType<typeof toFile>[]>((files, entry) => {
+    if (!entry.metadata?.ingestionJobId) {
+      files.push(toFile(ctx, entry, global));
+    }
+    return files;
+  }, []);
 }
 
 function toPublicIngestionJob(job: Doc<"ingestionJobs">) {

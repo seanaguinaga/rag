@@ -6,6 +6,10 @@ import "./index.css";
 
 console.log(import.meta.env);
 
+if (import.meta.env.DEV) {
+  void import("react-scan").then(({ scan }) => scan({ enabled: true }));
+}
+
 const address = import.meta.env.VITE_CONVEX_URL;
 
 const convex = new ConvexReactClient(address);

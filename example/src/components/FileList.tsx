@@ -1,6 +1,5 @@
-import { useEffect } from "react";
-import { useConvex, useQuery } from "convex/react";
-import { usePaginatedQuery } from "convex-helpers/react";
+import { type KeyboardEvent, useEffect } from "react";
+import { useConvex, usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { PublicFile } from "../../convex/rag/engine";
 
@@ -33,6 +32,14 @@ function getErrorMessage(error: unknown) {
   return String(error);
 }
 
+function selectOnKeyboard(event: KeyboardEvent<HTMLElement>, select: () => void) {
+  if (event.key !== "Enter" && event.key !== " ") {
+    return;
+  }
+  event.preventDefault();
+  select();
+}
+
 function PendingDocumentProgress({ doc }: { doc: PublicFile }) {
   const chunks = useQuery(api.rag.sources.listChunks, {
     entryId: doc.entryId,
@@ -60,11 +67,11 @@ function PendingDocumentProgress({ doc }: { doc: PublicFile }) {
     <div className="group relative p-4 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-200 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl">
       <div className="flex items-center justify-between">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-x-3">
             <div className="relative">
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg flex items-center justify-center">
+              <div className="size-8 bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-white"
+                  className="size-4 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -77,7 +84,7 @@ function PendingDocumentProgress({ doc }: { doc: PublicFile }) {
                   />
                 </svg>
               </div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
+              <div className="absolute -top-1 -right-1 size-3 bg-orange-500 rounded-full animate-pulse"></div>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-orange-900 truncate">
@@ -96,30 +103,30 @@ function PendingDocumentProgress({ doc }: { doc: PublicFile }) {
                 {doc.global ? "🌍 Shared" : "👤 User"}
               </span>
               <span className="px-2 py-1 bg-orange-100 rounded-full font-medium">
-                Processing...
+                Processing&hellip;
               </span>
             </div>
             {!chunks?.page?.length ? (
-              <div className="flex items-center space-x-2">
-                <div className="animate-spin rounded-full h-3 w-3 border-b border-orange-500"></div>
+              <div className="flex items-center gap-x-2">
+                <div className="animate-spin rounded-full size-3 border-b border-orange-500"></div>
                 <span className="text-xs text-orange-600">
-                  ⚙️ Generating text...
+                  ⚙️ Generating text&hellip;
                 </span>
               </div>
             ) : (
               <div className="space-y-2">
-                <div className="flex items-center space-x-4 text-xs text-orange-700">
+                <div className="flex items-center gap-x-4 text-xs text-orange-700">
                   <span className="flex items-center">
-                    <span className="w-2 h-2 bg-orange-400 rounded-full mr-1"></span>
+                    <span className="size-2 bg-orange-400 rounded-full mr-1"></span>
                     📝 Added: {progress.added} chunks
                   </span>
                   <span className="flex items-center">
-                    <span className="w-2 h-2 bg-emerald-400 rounded-full mr-1"></span>
+                    <span className="size-2 bg-emerald-400 rounded-full mr-1"></span>
                     ✅ Live: {progress.live} chunks
                   </span>
                 </div>
                 {progress.live > 0 && progress.added > progress.live && (
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-x-2">
                     <div className="flex-1 bg-orange-200 rounded-full h-2 overflow-hidden">
                       <div
                         className="bg-gradient-to-r from-orange-500 to-amber-500 h-2 rounded-full transition-all duration-300"
@@ -163,16 +170,16 @@ function IngestionJobCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-x-3">
             <div
-              className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+              className={`size-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
                 isProcessing
                   ? "bg-gradient-to-r from-orange-500 to-amber-500"
                   : "bg-gradient-to-r from-red-500 to-rose-500"
               }`}
             >
               <svg
-                className="w-4 h-4 text-white"
+                className="size-4 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -229,7 +236,7 @@ function IngestionJobCard({
                   isProcessing ? "bg-orange-100" : "bg-red-100"
                 }`}
               >
-                {isProcessing ? "Processing..." : `Failed ${job.attempts}x`}
+                {isProcessing ? "Processing…" : `Failed ${job.attempts}x`}
               </span>
             </div>
           </div>
@@ -342,13 +349,13 @@ export function FileList({
     <div className="flex-1 overflow-y-auto">
       {/* Pending Files Status */}
       {pendingFiles && pendingFiles.length > 0 && (
-        <div className="p-6 border-b border-gray-200/50">
+        <div className="p-6 border-b border-zinc-200/50">
           <div className="space-y-3">
             <div className="flex items-center mb-4">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gradient-to-r from-orange-500 to-red-500 mr-3"></div>
+              <div className="animate-spin rounded-full size-5 border-b-2 border-gradient-to-r from-orange-500 to-red-500 mr-3"></div>
               <h4 className="text-sm font-semibold text-orange-800">
                 Processing {pendingFiles.length} document
-                {pendingFiles.length !== 1 ? "s" : ""}...
+                {pendingFiles.length !== 1 ? "s" : ""}&hellip;
               </h4>
             </div>
             {pendingFiles.map((doc) => (
@@ -359,7 +366,7 @@ export function FileList({
       )}
 
       {ingestionJobs.results.length > 0 && (
-        <div className="p-6 border-b border-gray-200/50">
+        <div className="p-6 border-b border-zinc-200/50">
           <div className="space-y-3">
             <div className="flex items-center mb-4">
               <h4 className="text-sm font-semibold text-red-800">
@@ -389,10 +396,10 @@ export function FileList({
       {/* Shared Files */}
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+          <div className="flex items-center gap-x-3">
+            <div className="size-8 bg-gradient-to-r from-blue-500 to-violet-500 rounded-lg flex items-center justify-center">
               <svg
-                className="w-4 h-4 text-white"
+                className="size-4 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -405,15 +412,15 @@ export function FileList({
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-gray-900">Shared Files</h3>
+            <h3 className="font-semibold text-zinc-900">Shared Files</h3>
           </div>
           <button
             onClick={() => onSearchTypeChange("general", true)}
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+            className="p-2 text-blue-700 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200"
             title="Search all shared documents"
           >
             <svg
-              className="w-5 h-5"
+              className="size-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -434,19 +441,24 @@ export function FileList({
               className={`group relative p-4 rounded-xl transition-all duration-300 hover:shadow-md ${
                 selectedDocument?.filename === doc.filename &&
                 selectedDocument?.global === true
-                  ? "bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 shadow-lg"
-                  : "bg-white/60 backdrop-blur-sm border border-gray-200/50 hover:bg-white/80"
+                  ? "bg-gradient-to-r from-blue-50 to-violet-50 border-2 border-blue-200 shadow-lg"
+                  : "bg-white/60 backdrop-blur-sm border border-zinc-200/50 hover:bg-white/80"
               }`}
             >
               <div className="flex items-center justify-between">
                 <div
                   className="flex-1 min-w-0 cursor-pointer"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => onFileSelect(doc)}
+                  onKeyDown={(event) =>
+                    selectOnKeyboard(event, () => onFileSelect(doc))
+                  }
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-gray-500 to-gray-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="flex items-center gap-x-3">
+                    <div className="size-8 bg-gradient-to-r from-zinc-500 to-zinc-600 rounded-lg flex items-center justify-center flex-shrink-0">
                       <svg
-                        className="w-4 h-4 text-white"
+                        className="size-4 text-white"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -460,7 +472,7 @@ export function FileList({
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-900 truncate">
+                      <div className="text-sm font-semibold text-zinc-900 truncate">
                         {doc.filename}
                       </div>
                       {doc.category && (
@@ -472,7 +484,7 @@ export function FileList({
                           className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded-full transition-colors duration-200 mt-1"
                         >
                           <svg
-                            className="w-3 h-3 mr-1"
+                            className="size-3 mr-1"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -499,7 +511,7 @@ export function FileList({
                   title="Delete entry"
                 >
                   <svg
-                    className="w-4 h-4"
+                    className="size-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -519,12 +531,12 @@ export function FileList({
       </div>
 
       {/* User Files */}
-      <div className="p-6 border-t border-gray-200/50">
+      <div className="p-6 border-t border-zinc-200/50">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
+          <div className="flex items-center gap-x-3">
+            <div className="size-8 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
               <svg
-                className="w-4 h-4 text-white"
+                className="size-4 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -537,15 +549,15 @@ export function FileList({
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-gray-900">User Files</h3>
+            <h3 className="font-semibold text-zinc-900">User Files</h3>
           </div>
           <button
             onClick={() => onSearchTypeChange("general", false)}
-            className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200"
+            className="p-2 text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg transition-all duration-200"
             title="Search all user documents"
           >
             <svg
-              className="w-5 h-5"
+              className="size-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -567,18 +579,25 @@ export function FileList({
                 selectedDocument?.filename === doc.filename &&
                 selectedDocument?.global === false
                   ? "bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 shadow-lg"
-                  : "bg-white/60 backdrop-blur-sm border border-gray-200/50 hover:bg-white/80"
+                  : "bg-white/60 backdrop-blur-sm border border-zinc-200/50 hover:bg-white/80"
               }`}
             >
               <div className="flex items-center justify-between">
                 <div
                   className="flex-1 min-w-0 cursor-pointer"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => onFileSelect({ ...doc, global: false })}
+                  onKeyDown={(event) =>
+                    selectOnKeyboard(event, () =>
+                      onFileSelect({ ...doc, global: false }),
+                    )
+                  }
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-gray-500 to-gray-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="flex items-center gap-x-3">
+                    <div className="size-8 bg-gradient-to-r from-zinc-500 to-zinc-600 rounded-lg flex items-center justify-center flex-shrink-0">
                       <svg
-                        className="w-4 h-4 text-white"
+                        className="size-4 text-white"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -592,7 +611,7 @@ export function FileList({
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-900 truncate">
+                      <div className="text-sm font-semibold text-zinc-900 truncate">
                         {doc.filename}
                       </div>
                       {doc.category && (
@@ -604,7 +623,7 @@ export function FileList({
                           className="inline-flex items-center text-xs text-emerald-600 hover:text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2 py-1 rounded-full transition-colors duration-200 mt-1"
                         >
                           <svg
-                            className="w-3 h-3 mr-1"
+                            className="size-3 mr-1"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -631,7 +650,7 @@ export function FileList({
                   title="Delete entry"
                 >
                   <svg
-                    className="w-4 h-4"
+                    className="size-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

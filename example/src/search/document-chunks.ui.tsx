@@ -43,12 +43,12 @@ export function DocumentChunksUi({
   onLoadMore,
 }: DocumentChunksUiProps) {
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-6 h-full shadow-lg">
-      <div className="flex items-center space-x-3 mb-6">
-        <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-          <DocumentIcon className="w-5 h-5 text-white" />
+    <div className="bg-gradient-to-r from-blue-50 to-violet-50 rounded-2xl border border-blue-200 p-6 h-full shadow-lg">
+      <div className="flex items-center gap-x-3 mb-6">
+        <div className="size-10 bg-gradient-to-r from-blue-600 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
+          <DocumentIcon className="size-5 text-white" />
         </div>
-        <h3 className="text-xl font-bold text-blue-900">
+        <h3 className="text-xl font-semibold text-blue-900">
           Document Chunks ({chunks.length || 0})
         </h3>
       </div>
@@ -68,10 +68,10 @@ export function DocumentChunksUi({
               href={selectedDocument.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center space-x-2 bg-white hover:bg-gray-50 px-4 py-3 rounded-xl border border-gray-200 transition-all duration-200 hover:shadow-md"
+              className="inline-flex items-center gap-x-2 bg-white hover:bg-zinc-50 px-4 py-3 rounded-xl border border-zinc-200 transition-all duration-200 hover:shadow-md"
             >
               <svg
-                className="w-5 h-5 text-blue-600"
+                className="size-5 text-blue-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -96,12 +96,12 @@ export function DocumentChunksUi({
         style={{ height: "calc(100% - 8rem)" }}
       >
         {chunks.map((chunk) => (
-          <div key={chunk.order} className="flex items-start space-x-4 group">
-            <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-md">
+          <div key={chunk.order} className="flex items-start gap-x-4 group">
+            <div className="flex-shrink-0 size-8 bg-gradient-to-r from-blue-500 to-violet-500 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-md">
               {chunk.order}
             </div>
-            <div className="flex-1 bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200/50 shadow-sm group-hover:shadow-md transition-all duration-200">
-              <div className="text-sm text-gray-900 leading-relaxed font-medium">
+            <div className="flex-1 bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-zinc-200/50 shadow-sm group-hover:shadow-md transition-all duration-200">
+              <div className="text-sm text-zinc-900 leading-relaxed font-medium">
                 {chunk.text}
               </div>
             </div>
@@ -112,11 +112,11 @@ export function DocumentChunksUi({
           <div className="flex justify-center mt-6">
             <button
               onClick={() => onLoadMore(10)}
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-violet-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-violet-700 shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-x-2">
                 <svg
-                  className="w-4 h-4"
+                  className="size-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

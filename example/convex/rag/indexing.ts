@@ -490,14 +490,22 @@ export const deleteOldContent = internalMutation({
       paginationOpts: { cursor: args.cursor ?? null, numItems: 100 },
     });
 
+    const expiredEntries = [];
+    let reachedRecentEntry = false;
     for (const entry of toDelete.page) {
       assert(entry.status === "replaced");
       if (entry.replacedAt >= Date.now() - WEEK) {
-        return;
+        reachedRecentEntry = true;
+        break;
       }
-      await ragEngine.deleteAsync(ctx, { entryId: entry.entryId });
+      expiredEntries.push(entry);
     }
-    if (!toDelete.isDone) {
+    await Promise.all(
+      expiredEntries.map((entry) =>
+        ragEngine.deleteAsync(ctx, { entryId: entry.entryId }),
+      ),
+    );
+    if (!reachedRecentEntry && !toDelete.isDone) {
       await ctx.scheduler.runAfter(0, internal.rag.indexing.deleteOldContent, {
         cursor: toDelete.continueCursor,
       });

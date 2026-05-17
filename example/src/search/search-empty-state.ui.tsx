@@ -14,10 +14,10 @@ export function SearchEmptyStateUi({
   if (state.status === "loading") {
     return (
       <div className="text-center py-16">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <h3 className="text-xl font-bold text-gray-600">Searching...</h3>
-          <p className="text-gray-500">
+        <div className="flex flex-col items-center gap-y-4">
+          <div className="animate-spin rounded-full size-12 border-b-2 border-blue-600"></div>
+          <h3 className="text-xl font-semibold text-zinc-600">Searching&hellip;</h3>
+          <p className="text-zinc-500">
             Please wait while we search your documents
           </p>
         </div>
@@ -29,9 +29,9 @@ export function SearchEmptyStateUi({
     return (
       <div className="text-center py-16">
         <div className="max-w-lg mx-auto bg-red-50 border border-red-200 rounded-2xl p-6 shadow-sm">
-          <div className="w-14 h-14 bg-gradient-to-r from-red-500 to-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="size-14 bg-gradient-to-r from-red-500 to-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <svg
-              className="w-7 h-7 text-white"
+              className="size-7 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -44,7 +44,7 @@ export function SearchEmptyStateUi({
               />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-red-900 mb-2">
+          <h3 className="text-xl font-semibold text-red-900 mb-2">
             Search needs attention
           </h3>
           <p className="text-red-700 mb-5">{state.message}</p>
@@ -75,9 +75,9 @@ export function SearchEmptyStateUi({
 
   return (
     <div className="text-center py-16">
-      <div className="w-24 h-24 bg-gradient-to-r from-gray-200 to-gray-300 rounded-3xl flex items-center justify-center mx-auto mb-6">
+      <div className="size-24 bg-gradient-to-r from-zinc-200 to-zinc-300 rounded-3xl flex items-center justify-center mx-auto mb-6">
         <svg
-          className="w-12 h-12 text-gray-400"
+          className="size-12 text-zinc-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -90,10 +90,10 @@ export function SearchEmptyStateUi({
           />
         </svg>
       </div>
-      <h3 className="text-xl font-bold text-gray-600 mb-2">
+      <h3 className="text-xl font-semibold text-zinc-600 mb-2">
         Ready to Search or Ask
       </h3>
-      <p className="text-gray-500 max-w-md mx-auto">
+      <p className="text-zinc-500 max-w-md mx-auto">
         Use the search button to search your documents or the Ask button to get
         AI-generated answers using search context.
       </p>

@@ -10,10 +10,10 @@ export function QuestionAnswerUi({ questionResult }: QuestionAnswerUiProps) {
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl border border-purple-200 p-8 shadow-lg">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+        <div className="flex items-center gap-x-3 mb-4">
+          <div className="size-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
             <svg
-              className="w-5 h-5 text-white"
+              className="size-5 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -26,12 +26,12 @@ export function QuestionAnswerUi({ questionResult }: QuestionAnswerUiProps) {
               />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-purple-900">
+          <h3 className="text-xl font-semibold text-purple-900">
             Generated Answer
           </h3>
         </div>
-        <div className="max-w-none text-gray-900 leading-relaxed">
-          <div className="markdown-content text-gray-900">
+        <div className="max-w-none text-zinc-900 leading-relaxed">
+          <div className="markdown-content text-zinc-900">
             <MarkdownRenderer>{questionResult.answer}</MarkdownRenderer>
           </div>
         </div>

@@ -9,8 +9,8 @@ import { SearchResultsController } from "./search/search-results.controller";
 function ExampleContent() {
   return (
     <SearchProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex">
-        <div className="w-80 bg-white/90 backdrop-blur-sm border-r border-gray-200/50 flex flex-col shadow-xl">
+      <div className="min-h-screen bg-gradient-to-br from-zinc-50 via-blue-50 to-violet-50 flex">
+        <div className="w-80 bg-white/90 backdrop-blur-sm border-r border-zinc-200/50 flex flex-col shadow-xl">
           <UploadSection />
           <SearchFileListController />
         </div>

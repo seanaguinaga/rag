@@ -227,11 +227,11 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
   };
 
   return (
-    <div className="p-6 border-b border-gray-200/50 bg-gradient-to-r from-blue-50 to-indigo-50">
-      <div className="flex items-center space-x-3 mb-6">
-        <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+    <div className="p-6 border-b border-zinc-200/50 bg-gradient-to-r from-blue-50 to-violet-50">
+      <div className="flex items-center gap-x-3 mb-6">
+        <div className="size-10 bg-gradient-to-r from-blue-600 to-violet-600 rounded-xl flex items-center justify-center shadow-lg">
           <svg
-            className="w-5 h-5 text-white"
+            className="size-5 text-white"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -244,7 +244,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
             />
           </svg>
         </div>
-        <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+        <h2 className="text-xl font-semibold text-zinc-900">
           Upload Document
         </h2>
       </div>
@@ -252,12 +252,15 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
       <div className="space-y-4">
         {/* Category Input */}
         <div className="group">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label
+            htmlFor="upload-category"
+            className="block text-sm font-semibold text-zinc-700 mb-2"
+          >
             Category
           </label>
           <div className="relative">
             <input
-              id="category"
+              id="upload-category"
               type="text"
               value={uploadForm.category}
               onChange={(e) =>
@@ -267,20 +270,24 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                 }))
               }
               placeholder="Enter category"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/80 backdrop-blur-sm transition-all duration-200 placeholder-gray-400"
+              className="w-full px-4 py-3 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/80 backdrop-blur-sm transition-all duration-200 placeholder-zinc-400"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-violet-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
           </div>
         </div>
 
         {/* Filename Input */}
         <div className="group">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label
+            htmlFor="upload-filename"
+            className="block text-sm font-semibold text-zinc-700 mb-2"
+          >
             Filename{" "}
-            <span className="text-gray-400 font-normal">(optional)</span>
+            <span className="text-zinc-400 font-normal">(optional)</span>
           </label>
           <div className="relative">
             <input
+              id="upload-filename"
               type="text"
               value={uploadForm.filename}
               onChange={(e) =>
@@ -289,19 +296,19 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                   filename: e.target.value,
                 }))
               }
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/80 backdrop-blur-sm transition-all duration-200 placeholder-gray-400"
+              className="w-full px-4 py-3 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/80 backdrop-blur-sm transition-all duration-200 placeholder-zinc-400"
               placeholder="Override filename"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-violet-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
           </div>
         </div>
 
         {/* Global Toggle */}
-        <div className="flex items-center justify-between p-4 bg-white/60 rounded-xl border border-gray-200/50">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
+        <div className="flex items-center justify-between p-4 bg-white/60 rounded-xl border border-zinc-200/50">
+          <div className="flex items-center gap-x-3">
+            <div className="size-8 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
               <svg
-                className="w-4 h-4 text-white"
+                className="size-4 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -314,7 +321,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                 />
               </svg>
             </div>
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-zinc-700">
               Shared file
             </span>
           </div>
@@ -328,12 +335,12 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
             }
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
               uploadForm.globalNamespace
-                ? "bg-gradient-to-r from-blue-500 to-indigo-500 shadow-lg"
-                : "bg-gray-200"
+                ? "bg-gradient-to-r from-blue-500 to-violet-500 shadow-lg"
+                : "bg-zinc-200"
             }`}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-md ${
+              className={`inline-block size-4 transform rounded-full bg-white transition-transform shadow-md ${
                 uploadForm.globalNamespace ? "translate-x-6" : "translate-x-1"
               }`}
             />
@@ -354,20 +361,21 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                   }
                 }}
                 disabled={isAdding}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                className="absolute inset-0 size-full opacity-0 cursor-pointer z-10"
               />
               <label
                 htmlFor="file-upload"
+                aria-label="Upload file"
                 className={`group flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300 ${
                   isAdding
-                    ? "border-gray-300 bg-gray-50 cursor-not-allowed"
-                    : "border-gray-300 bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 hover:border-blue-400 hover:shadow-lg"
+                    ? "border-zinc-300 bg-zinc-50 cursor-not-allowed"
+                    : "border-zinc-300 bg-gradient-to-br from-blue-50 to-violet-50 hover:from-blue-100 hover:to-violet-100 hover:border-blue-400 hover:shadow-lg"
                 }`}
               >
                 <div className="flex flex-col items-center justify-center pt-4 pb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-200">
+                  <div className="size-12 bg-gradient-to-r from-blue-500 to-violet-500 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-200">
                     <svg
-                      className="w-6 h-6 text-white"
+                      className="size-6 text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -380,26 +388,26 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                       />
                     </svg>
                   </div>
-                  <p className="text-sm font-medium text-gray-600">
+                  <p className="text-sm font-medium text-zinc-600">
                     <span className="text-blue-600 font-semibold">
                       Click to upload
                     </span>{" "}
                     or drag and drop
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-zinc-500 mt-1">
                     Any file type supported
                   </p>
                 </div>
               </label>
             </>
           ) : (
-            <div className="relative p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border-2 border-blue-200 shadow-lg">
+            <div className="relative p-4 bg-gradient-to-r from-blue-50 to-violet-50 rounded-2xl border-2 border-blue-200 shadow-lg">
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-md">
+                  <div className="flex items-center gap-x-3">
+                    <div className="size-10 bg-gradient-to-r from-blue-500 to-violet-500 rounded-xl flex items-center justify-center shadow-md">
                       <svg
-                        className="w-5 h-5 text-white"
+                        className="size-5 text-white"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -413,7 +421,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                       </svg>
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-gray-900 truncate">
+                      <div className="text-sm font-semibold text-zinc-900 truncate">
                         {selectedFile.name}
                         {selectedFile && isPdfFile(selectedFile) && (
                           <span className="ml-2 text-xs text-white bg-gradient-to-r from-rose-500 to-pink-500 px-2 py-1 rounded-full font-medium">
@@ -421,7 +429,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-zinc-500">
                         {selectedFile.type || "Unknown type"}
                       </div>
                     </div>
@@ -432,9 +440,9 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                     <div className="mt-3 p-3 bg-white/60 rounded-xl">
                       {pdfExtraction.isExtracting && (
                         <div className="flex items-center text-sm text-blue-600">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-3"></div>
+                          <div className="animate-spin rounded-full size-4 border-b-2 border-blue-600 mr-3"></div>
                           <span className="font-medium">
-                            Extracting text from PDF...
+                            Extracting text from PDF&hellip;
                           </span>
                         </div>
                       )}
@@ -443,7 +451,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                         <div className="space-y-2">
                           <div className="flex items-center text-sm text-emerald-600">
                             <svg
-                              className="w-4 h-4 mr-2"
+                              className="size-4 mr-2"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -459,7 +467,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                               Text extracted successfully
                             </span>
                           </div>
-                          <div className="text-xs text-gray-600 bg-white/50 p-2 rounded-lg">
+                          <div className="text-xs text-zinc-600 bg-white/50 p-2 rounded-lg">
                             <div>📄 {pdfExtraction.result.pages} pages</div>
                             <div>
                               📝{" "}
@@ -467,7 +475,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                               characters
                             </div>
                             {pdfExtraction.result.title && (
-                              <div className="mt-1 text-gray-700">
+                              <div className="mt-1 text-zinc-700">
                                 <span className="font-medium">Title:</span>{" "}
                                 {pdfExtraction.result.title}
                               </div>
@@ -479,7 +487,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                       {pdfExtraction.error && (
                         <div className="flex items-center text-sm text-red-600">
                           <svg
-                            className="w-4 h-4 mr-2"
+                            className="size-4 mr-2"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -502,11 +510,11 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
                 <button
                   onClick={handleFileClear}
                   disabled={isAdding || pdfExtraction.isExtracting}
-                  className="ml-3 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
+                  className="ml-3 p-2 text-red-700 hover:text-red-800 hover:bg-red-50 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
                   title="Remove file"
                 >
                   <svg
-                    className="w-5 h-5 group-hover:scale-110 transition-transform duration-200"
+                    className="size-5 group-hover:scale-110 transition-transform duration-200"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -530,20 +538,20 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
           disabled={isAdding || !selectedFile || pdfExtraction.isExtracting}
           className={`w-full px-6 py-4 font-semibold rounded-xl transition-all duration-300 shadow-lg ${
             isAdding || !selectedFile || pdfExtraction.isExtracting
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              ? "bg-zinc-300 text-zinc-500 cursor-not-allowed"
               : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white hover:shadow-xl hover:scale-105"
           }`}
         >
-          <div className="flex items-center justify-center space-x-2">
+          <div className="flex items-center justify-center gap-x-2">
             {isAdding ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                <span>Adding Document...</span>
+                <div className="animate-spin rounded-full size-5 border-b-2 border-white"></div>
+                <span>Adding Document&hellip;</span>
               </>
             ) : pdfExtraction.isExtracting ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                <span>Processing PDF...</span>
+                <div className="animate-spin rounded-full size-5 border-b-2 border-white"></div>
+                <span>Processing PDF&hellip;</span>
               </>
             ) : selectedFile &&
               isPdfFile(selectedFile) &&
@@ -551,7 +559,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
               !pdfExtraction.error ? (
               <>
                 <svg
-                  className="w-5 h-5"
+                  className="size-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -568,7 +576,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
             ) : (
               <>
                 <svg
-                  className="w-5 h-5"
+                  className="size-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

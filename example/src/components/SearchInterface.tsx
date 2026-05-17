@@ -12,7 +12,7 @@ export function SearchInterface() {
   const isLoading = searchState.status === "loading";
 
   return (
-    <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200/50 p-6 shadow-sm">
+    <div className="bg-white/90 backdrop-blur-sm border-b border-zinc-200/50 p-6 shadow-sm">
       <SearchHeader />
       <ScopeControls
         scope={form.scope}
@@ -53,10 +53,10 @@ export function SearchInterface() {
 
 function SearchHeader() {
   return (
-    <div className="flex items-center space-x-4 mb-6">
-      <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
+    <div className="flex items-center gap-x-4 mb-6">
+      <div className="size-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
         <svg
-          className="w-6 h-6 text-white"
+          className="size-6 text-white"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -70,10 +70,10 @@ function SearchHeader() {
         </svg>
       </div>
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-semibold text-purple-700">
           Convex RAG Component
         </h1>
-        <p className="text-gray-600 mt-1">
+        <p className="text-zinc-600 mt-1">
           Intelligent search and question answering for your documents
         </p>
       </div>
@@ -101,16 +101,16 @@ function ScopeControls({
   const global = scope === "general" ? searchGlobal : categorySearchGlobal;
 
   return (
-    <div className="flex items-center space-x-4 mb-6">
-      <div className="flex space-x-2">
+    <div className="flex items-center gap-x-4 mb-6">
+      <div className="flex gap-x-2">
         {(["general", "category", "file"] as const).map((value) => (
           <button
             key={value}
             onClick={() => onScopeChange(value)}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
               scope === value
-                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
-                : "bg-white/80 text-gray-700 hover:bg-white shadow-sm hover:shadow-md"
+                ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-lg"
+                : "bg-white/80 text-zinc-700 hover:bg-white shadow-sm hover:shadow-md"
             }`}
           >
             {scopeLabel(value)}
@@ -118,9 +118,9 @@ function ScopeControls({
         ))}
       </div>
 
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center gap-x-4">
         {scope === "file" && selectedDocument && (
-          <div className="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+          <div className="px-4 py-2 bg-gradient-to-r from-blue-50 to-violet-50 rounded-xl border border-blue-200">
             <div className="text-sm font-semibold text-blue-800">
               {selectedDocument.filename}
             </div>
@@ -151,24 +151,24 @@ function NamespaceToggle({
   onChange: () => void;
 }) {
   return (
-    <div className="flex items-center space-x-3 bg-white/80 px-4 py-2 rounded-xl border border-gray-200">
-      <span className="text-sm text-gray-600 font-medium">User Files</span>
+    <div className="flex items-center gap-x-3 bg-white/80 px-4 py-2 rounded-xl border border-zinc-200">
+      <span className="text-sm text-zinc-600 font-medium">User Files</span>
       <button
         type="button"
         onClick={onChange}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
           global
-            ? "bg-gradient-to-r from-blue-500 to-indigo-500"
-            : "bg-gray-300"
+            ? "bg-gradient-to-r from-blue-500 to-violet-500"
+            : "bg-zinc-300"
         }`}
       >
         <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-md ${
+          className={`inline-block size-4 transform rounded-full bg-white transition-transform shadow-md ${
             global ? "translate-x-6" : "translate-x-1"
           }`}
         />
       </button>
-      <span className="text-sm text-gray-600 font-medium">Shared Files</span>
+      <span className="text-sm text-zinc-600 font-medium">Shared Files</span>
     </div>
   );
 }
@@ -184,14 +184,18 @@ function CategorySelect({
 }) {
   return (
     <div className="mb-6">
-      <label className="block text-sm font-semibold text-gray-700 mb-2">
+      <label
+        htmlFor="search-category"
+        className="block text-sm font-semibold text-zinc-700 mb-2"
+      >
         Category
       </label>
       <div className="relative">
         <select
+          id="search-category"
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/80 backdrop-blur-sm text-gray-900 appearance-none"
+          className="w-full px-4 py-3 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/80 backdrop-blur-sm text-zinc-900 appearance-none"
         >
           <option value="">Select a category</option>
           {categories.map((category) => (
@@ -202,7 +206,7 @@ function CategorySelect({
         </select>
         <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
           <svg
-            className="w-4 h-4 text-gray-400"
+            className="size-4 text-zinc-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -246,15 +250,15 @@ function QueryBox({
           }
         }}
         placeholder="Enter your search query or question..."
-        className="w-full px-6 py-4 pr-32 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/80 backdrop-blur-sm text-gray-900 placeholder-gray-500 text-lg"
+        className="w-full px-6 py-4 pr-32 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/80 backdrop-blur-sm text-zinc-900 placeholder-zinc-500 text-lg"
       />
-      <div className="absolute right-2 top-2 bottom-2 flex space-x-2">
+      <div className="absolute right-2 top-2 bottom-2 flex gap-x-2">
         <button
           onClick={() => onSearch("search")}
           disabled={disabled}
           className={`px-4 text-white rounded-lg font-semibold transition-all duration-300 ${
             disabled
-              ? "bg-gray-300 cursor-not-allowed"
+              ? "bg-zinc-300 cursor-not-allowed"
               : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg hover:shadow-xl"
           }`}
         >
@@ -265,7 +269,7 @@ function QueryBox({
           disabled={disabled}
           className={`px-4 text-white rounded-lg font-semibold transition-all duration-300 ${
             disabled
-              ? "bg-gray-300 cursor-not-allowed"
+              ? "bg-zinc-300 cursor-not-allowed"
               : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl"
           }`}
         >
@@ -305,10 +309,10 @@ function AdvancedOptions({
     <div className="mt-4">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
+        className="flex items-center gap-x-2 text-zinc-600 hover:text-zinc-800 transition-colors duration-200"
       >
         <svg
-          className={`w-4 h-4 transition-transform duration-200 ${
+          className={`size-4 transition-transform duration-200 ${
             open ? "rotate-180" : ""
           }`}
           fill="none"
@@ -326,7 +330,7 @@ function AdvancedOptions({
       </button>
 
       {open && (
-        <div className="mt-3 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm">
+        <div className="mt-3 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-zinc-200 shadow-sm">
           <SearchMode value={searchType} onChange={setSearchType} />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <NumberOption
@@ -365,17 +369,17 @@ function SearchMode({
   onChange: (type: SearchType) => void;
 }) {
   return (
-    <div className="flex items-center space-x-3 mb-4">
-      <label className="text-sm font-semibold text-gray-700">Search Mode</label>
-      <div className="flex space-x-1">
+    <div className="flex items-center gap-x-3 mb-4">
+      <span className="text-sm font-semibold text-zinc-700">Search Mode</span>
+      <div className="flex gap-x-1">
         {(["vector", "text", "hybrid"] as const).map((mode) => (
           <button
             key={mode}
             onClick={() => onChange(mode)}
             className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
               value === mode
-                ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                ? "bg-gradient-to-r from-blue-500 to-violet-500 text-white shadow-md"
+                : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
             }`}
           >
             {modeLabel(mode)}
@@ -405,12 +409,18 @@ function NumberOption({
   max: number;
   onChange: (value: number) => void;
 }) {
+  const id = `search-${label.toLowerCase().replaceAll(" ", "-")}`;
+
   return (
     <div>
-      <label className="block text-sm font-semibold text-gray-700 mb-2">
+      <label
+        htmlFor={id}
+        className="block text-sm font-semibold text-zinc-700 mb-2"
+      >
         {label}
       </label>
       <input
+        id={id}
         type="number"
         value={value}
         onChange={(event) =>
@@ -418,7 +428,7 @@ function NumberOption({
         }
         min={min}
         max={max}
-        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+        className="w-full px-3 py-2 border border-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
       />
     </div>
   );
