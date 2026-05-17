@@ -4,11 +4,25 @@ import {
   runQuestionAction,
   runSearchAction,
 } from "./search-actions.controller";
-import {
-  getErrorMessage,
-  validateSearchRequest,
-} from "./search-request.controller";
-import type { QueryMode, SearchRequest, SearchState } from "./search.types";
+import type { SearchRequest } from "./search-form.controller";
+import type { UISearchResult } from "./search-response.controller";
+
+export type QueryMode = "search" | "question";
+
+export type SearchState =
+  | { status: "idle" }
+  | { status: "loading"; mode: QueryMode }
+  | {
+      status: "success";
+      mode: QueryMode;
+      searchResults: UISearchResult;
+      questionResult: {
+        answer: string;
+        results: UISearchResult["results"];
+        files: UISearchResult["files"];
+      } | null;
+    }
+  | { status: "error"; mode: QueryMode; message: string };
 
 export function useRagSearch() {
   const convex = useConvex();
@@ -59,4 +73,51 @@ export function useRagSearch() {
     runSearch,
     clearSearch,
   };
+}
+
+function validateSearchRequest(
+  mode: QueryMode,
+  request: SearchRequest,
+): SearchState | "empty" | "valid" {
+  if (!request.query.trim()) {
+    return "empty";
+  }
+
+  if (request.scope === "file" && !request.selectedDocument) {
+    return {
+      status: "error",
+      mode,
+      message: "Please select a file to search.",
+    };
+  }
+
+  if (request.scope === "category" && !request.selectedCategory.trim()) {
+    return {
+      status: "error",
+      mode,
+      message: "Please select a category for category search.",
+    };
+  }
+
+  return "valid";
+}
+
+function getErrorMessage(error: unknown) {
+  if (
+    error &&
+    typeof error === "object" &&
+    "data" in error &&
+    error.data &&
+    typeof error.data === "object" &&
+    "message" in error.data &&
+    typeof error.data.message === "string"
+  ) {
+    return error.data.message;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return String(error);
 }

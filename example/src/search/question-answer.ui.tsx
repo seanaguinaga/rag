@@ -1,8 +1,9 @@
 import { MarkdownRenderer } from "../MarkdownRenderer";
-import type { UIQuestionResult } from "./search.types";
 
 interface QuestionAnswerUiProps {
-  questionResult: UIQuestionResult;
+  questionResult: {
+    answer: string;
+  };
 }
 
 export function QuestionAnswerUi({ questionResult }: QuestionAnswerUiProps) {

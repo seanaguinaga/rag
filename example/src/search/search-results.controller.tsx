@@ -1,28 +1,15 @@
 import { usePaginatedQuery } from "convex-helpers/react";
 import { useState } from "react";
 import { api } from "../../convex/_generated/api";
-import type { PublicFile } from "../../convex/rag/engine";
 import { DocumentChunksUi } from "./document-chunks.ui";
 import { QuestionAnswerUi } from "./question-answer.ui";
+import { useSearch } from "./search.context";
 import { SearchEmptyStateUi } from "./search-empty-state.ui";
 import { SearchResultsUi } from "./search-results.ui";
-import type { QueryMode, SearchScope, SearchState } from "./search.types";
 
-interface SearchResultsControllerProps {
-  searchState: SearchState;
-  searchScope: SearchScope;
-  selectedDocument: PublicFile | null;
-  onRetry: (mode: QueryMode) => void;
-  onClear: () => void;
-}
-
-export function SearchResultsController({
-  searchState,
-  searchScope,
-  selectedDocument,
-  onRetry,
-  onClear,
-}: SearchResultsControllerProps) {
+export function SearchResultsController() {
+  const { form, searchState, search, clear } = useSearch();
+  const selectedDocument = form.selectedDocument;
   const [showFullText, setShowFullText] = useState(false);
 
   const documentChunks = usePaginatedQuery(
@@ -41,7 +28,7 @@ export function SearchResultsController({
   const questionResult =
     searchState.status === "success" ? searchState.questionResult : null;
   const showDocumentChunks =
-    searchScope === "file" &&
+    form.scope === "file" &&
     selectedDocument &&
     documentChunks.status !== "LoadingFirstPage" &&
     searchState.status === "idle";
@@ -52,7 +39,7 @@ export function SearchResultsController({
     <div className="flex-1 overflow-y-auto p-6">
       {questionResult && <QuestionAnswerUi questionResult={questionResult} />}
 
-      {showDocumentChunks && (
+      {showDocumentChunks && selectedDocument && (
         <DocumentChunksUi
           selectedDocument={selectedDocument}
           chunks={documentChunks.results}
@@ -72,8 +59,8 @@ export function SearchResultsController({
       {showEmptyState && (
         <SearchEmptyStateUi
           state={searchState}
-          onRetry={onRetry}
-          onClear={onClear}
+          onRetry={search}
+          onClear={clear}
         />
       )}
     </div>

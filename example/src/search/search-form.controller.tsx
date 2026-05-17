@@ -1,27 +1,41 @@
 import type { SearchType } from "@convex-dev/rag";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { PublicFile } from "../../convex/rag/engine";
-import type { SearchRequest, SearchScope } from "./search.types";
+
+export type SearchScope = "general" | "category" | "file";
+
+export interface SearchRequest {
+  query: string;
+  scope: SearchScope;
+  searchGlobal: boolean;
+  categorySearchGlobal: boolean;
+  selectedCategory: string;
+  selectedDocument: PublicFile | null;
+  limit: number;
+  chunksBefore: number;
+  chunksAfter: number;
+  searchType: SearchType;
+}
 
 export function useSearchFormController() {
-  const [searchScope, setSearchScope] = useState<SearchScope>("general");
+  const [query, setQuery] = useState("");
+  const [scope, setScope] = useState<SearchScope>("general");
   const [searchGlobal, setSearchGlobal] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [categorySearchGlobal, setCategorySearchGlobal] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedDocument, setSelectedDocument] = useState<PublicFile | null>(
     null,
   );
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [categorySearchGlobal, setCategorySearchGlobal] = useState(true);
   const [limit, setLimit] = useState(10);
   const [chunksBefore, setChunksBefore] = useState(1);
   const [chunksAfter, setChunksAfter] = useState(1);
-  const [categories, setCategories] = useState<string[]>([]);
   const [searchType, setSearchType] = useState<SearchType>("vector");
+  const [categories, setCategories] = useState<string[]>([]);
 
   const buildSearchRequest = useCallback(
     (): SearchRequest => ({
-      query: searchQuery,
-      scope: searchScope,
+      query,
+      scope,
       searchGlobal,
       categorySearchGlobal,
       selectedCategory,
@@ -32,8 +46,8 @@ export function useSearchFormController() {
       searchType,
     }),
     [
-      searchQuery,
-      searchScope,
+      query,
+      scope,
       searchGlobal,
       categorySearchGlobal,
       selectedCategory,
@@ -45,49 +59,69 @@ export function useSearchFormController() {
     ],
   );
 
-  const handleFileSelect = (file: PublicFile | null) => {
+  const handleFileSelect = useCallback((file: PublicFile | null) => {
     setSelectedDocument(file);
-    if (file) {
-      setSearchScope("file");
-    }
-  };
+    if (file) setScope("file");
+  }, []);
 
-  const handleCategorySelect = (category: string) => {
+  const handleCategorySelect = useCallback((category: string) => {
     setSelectedCategory(category);
-    setSearchScope("category");
-  };
+    setScope("category");
+  }, []);
 
-  const handleSearchTypeChange = (type: SearchScope, global: boolean) => {
-    setSearchScope(type);
-    setSearchGlobal(global);
-    setSelectedDocument(null);
-  };
+  const handleSearchTypeChange = useCallback(
+    (nextScope: SearchScope, global: boolean) => {
+      setScope(nextScope);
+      setSearchGlobal(global);
+      setSelectedDocument(null);
+    },
+    [],
+  );
 
-  return {
-    searchScope,
-    setSearchScope,
-    searchGlobal,
-    setSearchGlobal,
-    searchQuery,
-    setSearchQuery,
-    selectedDocument,
-    selectedCategory,
-    setSelectedCategory,
-    categorySearchGlobal,
-    setCategorySearchGlobal,
-    limit,
-    setLimit,
-    chunksBefore,
-    setChunksBefore,
-    chunksAfter,
-    setChunksAfter,
-    categories,
-    setCategories,
-    searchType,
-    setSearchType,
-    buildSearchRequest,
-    handleFileSelect,
-    handleCategorySelect,
-    handleSearchTypeChange,
-  };
+  return useMemo(
+    () => ({
+      query,
+      setQuery,
+      scope,
+      setScope,
+      searchGlobal,
+      setSearchGlobal,
+      categorySearchGlobal,
+      setCategorySearchGlobal,
+      selectedCategory,
+      setSelectedCategory,
+      selectedDocument,
+      limit,
+      setLimit,
+      chunksBefore,
+      setChunksBefore,
+      chunksAfter,
+      setChunksAfter,
+      searchType,
+      setSearchType,
+      categories,
+      setCategories,
+      buildSearchRequest,
+      handleFileSelect,
+      handleCategorySelect,
+      handleSearchTypeChange,
+    }),
+    [
+      query,
+      scope,
+      searchGlobal,
+      categorySearchGlobal,
+      selectedCategory,
+      selectedDocument,
+      limit,
+      chunksBefore,
+      chunksAfter,
+      searchType,
+      categories,
+      buildSearchRequest,
+      handleFileSelect,
+      handleCategorySelect,
+      handleSearchTypeChange,
+    ],
+  );
 }

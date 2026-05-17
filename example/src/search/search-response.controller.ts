@@ -1,6 +1,15 @@
 import type { SearchResult } from "@convex-dev/rag";
 import type { PublicFile } from "../../convex/rag/engine";
-import type { UISearchResult } from "./search.types";
+
+export type DecoratedSearchResult = SearchResult & {
+  entry: PublicFile;
+};
+
+export interface UISearchResult {
+  results: DecoratedSearchResult[];
+  text: string;
+  files: PublicFile[];
+}
 
 export function attachSources(results: SearchResult[], files: PublicFile[]) {
   const sourcesByEntryId = new Map(

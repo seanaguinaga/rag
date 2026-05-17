@@ -1,4 +1,4 @@
-import type { UISearchResult } from "./search.types";
+import type { UISearchResult } from "./search-response.controller";
 
 interface SearchResultsUiProps {
   searchResults: UISearchResult;

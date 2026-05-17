@@ -1,4 +1,4 @@
-import type { QueryMode, SearchState } from "./search.types";
+import type { QueryMode, SearchState } from "./search.controller";
 
 interface SearchEmptyStateUiProps {
   state: SearchState;

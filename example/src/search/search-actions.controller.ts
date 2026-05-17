@@ -1,10 +1,9 @@
+import type { EntryFilter } from "@convex-dev/rag";
 import type { useConvex } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import type { SearchRequest, SearchState } from "./search.types";
-import {
-  getQuestionFilter,
-  getQuestionNamespace,
-} from "./search-request.controller";
+import type { Filters } from "../../convex/rag/engine";
+import type { SearchState } from "./search.controller";
+import type { SearchRequest } from "./search-form.controller";
 import { toUiSearchResult } from "./search-response.controller";
 
 type ConvexClient = ReturnType<typeof useConvex>;
@@ -101,4 +100,33 @@ export async function runSearchAction(
     searchResults: toUiSearchResult(results),
     questionResult: null,
   };
+}
+
+function getQuestionFilter(
+  request: SearchRequest,
+): EntryFilter<Filters> | undefined {
+  if (request.scope === "category") {
+    return { name: "category", value: request.selectedCategory };
+  }
+
+  if (request.scope === "file" && request.selectedDocument) {
+    return {
+      name: "filename",
+      value: request.selectedDocument.filename,
+    };
+  }
+
+  return undefined;
+}
+
+function getQuestionNamespace(request: SearchRequest) {
+  if (request.scope === "general") {
+    return request.searchGlobal;
+  }
+
+  if (request.scope === "category") {
+    return request.categorySearchGlobal;
+  }
+
+  return request.selectedDocument?.global || false;
 }

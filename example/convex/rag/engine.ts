@@ -29,7 +29,7 @@ export async function queryForSearch(
   query: string,
   searchType: typeof vSearchType.type | undefined,
 ) {
-  if (searchType === "text") {
+  if (searchType === "text" || searchType === "hybrid") {
     return query;
   }
   const result = await embed({
