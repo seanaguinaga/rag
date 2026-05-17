@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useConvex } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import {
@@ -78,54 +78,49 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
 
   const convex = useConvex();
 
-  const handleFileSelect = useCallback(
-    async (file: File) => {
-      setSelectedFile(file);
-      setUploadForm((prev) => ({ ...prev, filename: file.name }));
+  const handleFileSelect = async (file: File) => {
+    setSelectedFile(file);
+    setUploadForm((prev) => ({ ...prev, filename: file.name }));
 
-      // Reset PDF extraction state
-      setPdfExtraction({
-        isExtracting: false,
-        result: null,
-        error: null,
-      });
+    // Reset PDF extraction state
+    setPdfExtraction({
+      isExtracting: false,
+      result: null,
+      error: null,
+    });
 
-      // If it's a PDF, extract text
-      if (isPdfFile(file)) {
-        setPdfExtraction((prev) => ({ ...prev, isExtracting: true }));
+    // If it's a PDF, extract text
+    if (isPdfFile(file)) {
+      setPdfExtraction((prev) => ({ ...prev, isExtracting: true }));
 
-        try {
-          const extractionResult = await extractTextFromPdf(file);
-          setPdfExtraction({
-            isExtracting: false,
-            result: extractionResult,
-            error: null,
-          });
+      try {
+        const extractionResult = await extractTextFromPdf(file);
+        setPdfExtraction({
+          isExtracting: false,
+          result: extractionResult,
+          error: null,
+        });
 
-          // Auto-populate title from PDF metadata if available
-          if (extractionResult.title && !uploadForm.filename) {
-            setUploadForm((prev) => ({
-              ...prev,
-              filename: extractionResult.title || file.name,
-            }));
-          }
-        } catch (error) {
-          console.error("PDF extraction failed:", error);
-          setPdfExtraction({
-            isExtracting: false,
-            result: null,
-            error:
-              error instanceof Error
-                ? error.message
-                : "Failed to extract PDF text",
-          });
+        // Auto-populate title from PDF metadata if available
+        if (extractionResult.title && !uploadForm.filename) {
+          setUploadForm((prev) => ({
+            ...prev,
+            filename: extractionResult.title || file.name,
+          }));
         }
+      } catch (error) {
+        console.error("PDF extraction failed:", error);
+        setPdfExtraction({
+          isExtracting: false,
+          result: null,
+          error:
+            error instanceof Error ? error.message : "Failed to extract PDF text",
+        });
       }
-    },
-    [uploadForm.filename],
-  );
+    }
+  };
 
-  const handleFileClear = useCallback(() => {
+  const handleFileClear = () => {
     setSelectedFile(null);
     setUploadForm((prev) => ({ ...prev, filename: "" }));
     setPdfExtraction({
@@ -138,9 +133,9 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
       'input[type="file"]',
     ) as HTMLInputElement;
     if (fileInput) fileInput.value = "";
-  }, []);
+  };
 
-  const handleFileUpload = useCallback(async () => {
+  const handleFileUpload = async () => {
     if (!selectedFile) {
       alert("Please select a file first");
       return;
@@ -229,7 +224,7 @@ export function UploadSection({ onFileUploaded }: UploadSectionProps) {
     } finally {
       setIsAdding(false);
     }
-  }, [convex, uploadForm, selectedFile, pdfExtraction, onFileUploaded]);
+  };
 
   return (
     <div className="p-6 border-b border-gray-200/50 bg-gradient-to-r from-blue-50 to-indigo-50">

@@ -1,10 +1,4 @@
-import {
-  createContext,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useMemo,
-} from "react";
+import { createContext, type ReactNode, useContext } from "react";
 import type { PublicFile } from "../../convex/rag/engine";
 import { type QueryMode, useRagSearch } from "./search.controller";
 import {
@@ -30,85 +24,54 @@ function useSearchController() {
     setSearchGlobal,
   } = form;
 
-  const search = useCallback(
-    (mode: QueryMode) => {
-      void runSearch(mode, buildSearchRequest());
-    },
-    [buildSearchRequest, runSearch],
-  );
+  const search = (mode: QueryMode) => {
+    void runSearch(mode, buildSearchRequest());
+  };
 
-  const clear = useCallback(() => {
+  const clear = () => {
     clearSearch();
-  }, [clearSearch]);
+  };
 
-  const setScope = useCallback(
-    (scope: SearchScope) => {
-      setFormScope(scope);
-      clearSearch();
-    },
-    [clearSearch, setFormScope],
-  );
+  const setScope = (scope: SearchScope) => {
+    setFormScope(scope);
+    clearSearch();
+  };
 
-  const selectFile = useCallback(
-    (file: PublicFile | null) => {
-      handleFileSelect(file);
-      clearSearch();
-    },
-    [clearSearch, handleFileSelect],
-  );
+  const selectFile = (file: PublicFile | null) => {
+    handleFileSelect(file);
+    clearSearch();
+  };
 
-  const selectCategory = useCallback(
-    (category: string) => {
-      handleCategorySelect(category);
-      clearSearch();
-    },
-    [clearSearch, handleCategorySelect],
-  );
+  const selectCategory = (category: string) => {
+    handleCategorySelect(category);
+    clearSearch();
+  };
 
-  const selectSidebarScope = useCallback(
-    (scope: SearchScope, global: boolean) => {
-      handleSearchTypeChange(scope, global);
-      clearSearch();
-    },
-    [clearSearch, handleSearchTypeChange],
-  );
+  const selectSidebarScope = (scope: SearchScope, global: boolean) => {
+    handleSearchTypeChange(scope, global);
+    clearSearch();
+  };
 
-  const setCurrentNamespaceGlobal = useCallback(
-    (global: boolean) => {
-      if (scope === "general") {
-        setSearchGlobal(global);
-      } else if (scope === "category") {
-        setCategorySearchGlobal(global);
-      }
-      clearSearch();
-    },
-    [clearSearch, scope, setCategorySearchGlobal, setSearchGlobal],
-  );
+  const setCurrentNamespaceGlobal = (global: boolean) => {
+    if (scope === "general") {
+      setSearchGlobal(global);
+    } else if (scope === "category") {
+      setCategorySearchGlobal(global);
+    }
+    clearSearch();
+  };
 
-  return useMemo(
-    () => ({
-      form,
-      searchState,
-      search,
-      clear,
-      setScope,
-      selectFile,
-      selectCategory,
-      selectSidebarScope,
-      setCurrentNamespaceGlobal,
-    }),
-    [
-      form,
-      searchState,
-      search,
-      clear,
-      setScope,
-      selectFile,
-      selectCategory,
-      selectSidebarScope,
-      setCurrentNamespaceGlobal,
-    ],
-  );
+  return {
+    form,
+    searchState,
+    search,
+    clear,
+    setScope,
+    selectFile,
+    selectCategory,
+    selectSidebarScope,
+    setCurrentNamespaceGlobal,
+  };
 }
 
 export function SearchProvider({ children }: { children: ReactNode }) {

@@ -1,5 +1,5 @@
 import { useConvex } from "convex/react";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import {
   runQuestionAction,
   runSearchAction,
@@ -28,44 +28,41 @@ export function useRagSearch() {
   const convex = useConvex();
   const [state, setState] = useState<SearchState>({ status: "idle" });
 
-  const clearSearch = useCallback(() => {
+  const clearSearch = () => {
     setState({ status: "idle" });
-  }, []);
+  };
 
-  const runSearch = useCallback(
-    async (mode: QueryMode, request: SearchRequest) => {
-      const validationResult = validateSearchRequest(mode, request);
+  const runSearch = async (mode: QueryMode, request: SearchRequest) => {
+    const validationResult = validateSearchRequest(mode, request);
 
-      if (validationResult === "empty") {
-        setState({ status: "idle" });
-        return;
-      }
+    if (validationResult === "empty") {
+      setState({ status: "idle" });
+      return;
+    }
 
-      if (validationResult !== "valid") {
-        setState(validationResult);
-        return;
-      }
+    if (validationResult !== "valid") {
+      setState(validationResult);
+      return;
+    }
 
-      setState({ status: "loading", mode });
+    setState({ status: "loading", mode });
 
-      try {
-        const nextState =
-          mode === "question"
-            ? await runQuestionAction(convex, request)
-            : await runSearchAction(convex, request);
+    try {
+      const nextState =
+        mode === "question"
+          ? await runQuestionAction(convex, request)
+          : await runSearchAction(convex, request);
 
-        setState(nextState);
-      } catch (error) {
-        console.error("Search/Question failed:", error);
-        setState({
-          status: "error",
-          mode,
-          message: `${mode === "question" ? "Question" : "Search"} failed. ${getErrorMessage(error)}`,
-        });
-      }
-    },
-    [convex],
-  );
+      setState(nextState);
+    } catch (error) {
+      console.error("Search/Question failed:", error);
+      setState({
+        status: "error",
+        mode,
+        message: `${mode === "question" ? "Question" : "Search"} failed. ${getErrorMessage(error)}`,
+      });
+    }
+  };
 
   return {
     state,

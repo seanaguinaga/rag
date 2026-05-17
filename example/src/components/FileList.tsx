@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useConvex, useQuery } from "convex/react";
 import { usePaginatedQuery } from "convex-helpers/react";
 import { api } from "../../convex/_generated/api";
@@ -287,54 +287,45 @@ export function FileList({
     { initialNumItems: 10 },
   );
 
-  const handleDelete = useCallback(
-    async (doc: PublicFile) => {
-      try {
-        await convex.mutation(api.rag.sources.deleteFile, {
-          entryId: doc.entryId,
-        });
+  const handleDelete = async (doc: PublicFile) => {
+    try {
+      await convex.mutation(api.rag.sources.deleteFile, {
+        entryId: doc.entryId,
+      });
 
-        // Clear selected entry if it was the one being deleted
-        if (selectedDocument?.entryId === doc.entryId) {
-          onFileSelect(null);
-        }
-      } catch (error) {
-        console.error("Delete failed:", error);
-        alert(
-          `Failed to delete entry. ${error instanceof Error ? error.message : String(error)}`,
-        );
+      // Clear selected entry if it was the one being deleted
+      if (selectedDocument?.entryId === doc.entryId) {
+        onFileSelect(null);
       }
-    },
-    [convex, selectedDocument, onFileSelect],
-  );
+    } catch (error) {
+      console.error("Delete failed:", error);
+      alert(
+        `Failed to delete entry. ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  };
 
-  const handleRetryJob = useCallback(
-    async (job: PublicIngestionJob) => {
-      try {
-        await convex.action(api.rag.indexing.retryIngestionJob, {
-          jobId: job._id,
-        });
-      } catch (retryError) {
-        console.error("Retry failed:", retryError);
-        alert(`Retry failed. ${getErrorMessage(retryError)}`);
-      }
-    },
-    [convex],
-  );
+  const handleRetryJob = async (job: PublicIngestionJob) => {
+    try {
+      await convex.action(api.rag.indexing.retryIngestionJob, {
+        jobId: job._id,
+      });
+    } catch (retryError) {
+      console.error("Retry failed:", retryError);
+      alert(`Retry failed. ${getErrorMessage(retryError)}`);
+    }
+  };
 
-  const handleDismissJob = useCallback(
-    async (job: PublicIngestionJob) => {
-      try {
-        await convex.mutation(api.rag.sources.dismissIngestionJob, {
-          jobId: job._id,
-        });
-      } catch (dismissError) {
-        console.error("Dismiss failed:", dismissError);
-        alert(`Failed to dismiss error. ${getErrorMessage(dismissError)}`);
-      }
-    },
-    [convex],
-  );
+  const handleDismissJob = async (job: PublicIngestionJob) => {
+    try {
+      await convex.mutation(api.rag.sources.dismissIngestionJob, {
+        jobId: job._id,
+      });
+    } catch (dismissError) {
+      console.error("Dismiss failed:", dismissError);
+      alert(`Failed to dismiss error. ${getErrorMessage(dismissError)}`);
+    }
+  };
 
   useEffect(() => {
     const categories = new Set<string>();

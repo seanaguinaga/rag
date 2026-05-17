@@ -1,5 +1,5 @@
 import type { SearchType } from "@convex-dev/rag";
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import type { PublicFile } from "../../convex/rag/engine";
 
 export type SearchScope = "general" | "category" | "file";
@@ -32,96 +32,60 @@ export function useSearchFormController() {
   const [searchType, setSearchType] = useState<SearchType>("vector");
   const [categories, setCategories] = useState<string[]>([]);
 
-  const buildSearchRequest = useCallback(
-    (): SearchRequest => ({
-      query,
-      scope,
-      searchGlobal,
-      categorySearchGlobal,
-      selectedCategory,
-      selectedDocument,
-      limit,
-      chunksBefore,
-      chunksAfter,
-      searchType,
-    }),
-    [
-      query,
-      scope,
-      searchGlobal,
-      categorySearchGlobal,
-      selectedCategory,
-      selectedDocument,
-      limit,
-      chunksBefore,
-      chunksAfter,
-      searchType,
-    ],
-  );
+  const buildSearchRequest = (): SearchRequest => ({
+    query,
+    scope,
+    searchGlobal,
+    categorySearchGlobal,
+    selectedCategory,
+    selectedDocument,
+    limit,
+    chunksBefore,
+    chunksAfter,
+    searchType,
+  });
 
-  const handleFileSelect = useCallback((file: PublicFile | null) => {
+  const handleFileSelect = (file: PublicFile | null) => {
     setSelectedDocument(file);
     if (file) setScope("file");
-  }, []);
+  };
 
-  const handleCategorySelect = useCallback((category: string) => {
+  const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
     setScope("category");
-  }, []);
+  };
 
-  const handleSearchTypeChange = useCallback(
-    (nextScope: SearchScope, global: boolean) => {
-      setScope(nextScope);
-      setSearchGlobal(global);
-      setSelectedDocument(null);
-    },
-    [],
-  );
+  const handleSearchTypeChange = (nextScope: SearchScope, global: boolean) => {
+    setScope(nextScope);
+    setSearchGlobal(global);
+    setSelectedDocument(null);
+  };
 
-  return useMemo(
-    () => ({
-      query,
-      setQuery,
-      scope,
-      setScope,
-      searchGlobal,
-      setSearchGlobal,
-      categorySearchGlobal,
-      setCategorySearchGlobal,
-      selectedCategory,
-      setSelectedCategory,
-      selectedDocument,
-      limit,
-      setLimit,
-      chunksBefore,
-      setChunksBefore,
-      chunksAfter,
-      setChunksAfter,
-      searchType,
-      setSearchType,
-      categories,
-      setCategories,
-      buildSearchRequest,
-      handleFileSelect,
-      handleCategorySelect,
-      handleSearchTypeChange,
-    }),
-    [
-      query,
-      scope,
-      searchGlobal,
-      categorySearchGlobal,
-      selectedCategory,
-      selectedDocument,
-      limit,
-      chunksBefore,
-      chunksAfter,
-      searchType,
-      categories,
-      buildSearchRequest,
-      handleFileSelect,
-      handleCategorySelect,
-      handleSearchTypeChange,
-    ],
-  );
+  return {
+    query,
+    setQuery,
+    scope,
+    setScope,
+    searchGlobal,
+    setSearchGlobal,
+    categorySearchGlobal,
+    setCategorySearchGlobal,
+    selectedCategory,
+    setSelectedCategory,
+    selectedDocument,
+    limit,
+    setLimit,
+    chunksBefore,
+    setChunksBefore,
+    chunksAfter,
+    setChunksAfter,
+    searchType,
+    setSearchType,
+    categories,
+    setCategories,
+    buildSearchRequest,
+    handleFileSelect,
+    handleCategorySelect,
+    handleSearchTypeChange,
+  };
 }
